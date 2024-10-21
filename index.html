@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodBridge - Login</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="content">
+                <h1>BloodBridge</h1>
+                <p>Connecting donors, hospitals, and blood banks to save lives.</p>
+                <div class="features">
+                    <div class="feature">
+                        <i class="fas fa-tint"></i>
+                        <span>Efficient Blood Management</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-hospital-user"></i>
+                        <span>Emergency Request Handling</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Easy Donation Scheduling</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="login-container">
+                <div class="logo"></div>
+                <h2>Welcome Back</h2>
+                <form id="login-form">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="email" id="email" placeholder="Email" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Password" required>
+                    </div>
+                    <div class="user-type-selector">
+                        <div class="option">
+                            <input type="radio" id="admin" name="user-type" value="admin" required>
+                            <label for="admin">
+                                <i class="fas fa-hospital"></i>
+                                Hospital Admin
+                            </label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="donor" name="user-type" value="donor">
+                            <label for="donor">
+                                <i class="fas fa-user"></i>
+                                Donor
+                            </label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="manager" name="user-type" value="manager">
+                            <label for="manager">
+                                <i class="fas fa-user-tie"></i>
+                                Blood Bank Manager
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+                <p class="signup-link">Don't have an account? <a href="signup.html">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+</html>

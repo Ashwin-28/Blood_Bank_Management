@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Bank Manager Dashboard - BloodBridge</title>
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1><i class="fas fa-hospital-user"></i> Blood Bank Manager Dashboard</h1>
+            <nav>
+                <ul>
+                    <li><a href="#inventory"><i class="fas fa-warehouse"></i> Inventory Management</a></li>
+                    <li><a href="#blood-history"><i class="fas fa-history"></i> Blood History</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <section id="inventory">
+                <h2>Inventory Management</h2>
+                <table id="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Blood Type</th>
+                            <th>Current Stock</th>
+                            <th>Update Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be added dynamically -->
+                    </tbody>
+                </table>
+            </section>
+            <section id="blood-history">
+                <h2>Blood History</h2>
+                <table id="blood-history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Blood Type</th>
+                            <th>Quantity</th>
+                            <th>Type</th>
+                            <th>Source/Destination</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be added dynamically -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+    <script src="../js/shared_data.js"></script>
+    <script src="../js/manager_dashboard.js"></script>
+</body>
+</html>

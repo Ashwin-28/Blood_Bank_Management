@@ -1,0 +1,486 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f0f2f5;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+    min-height: 600px;
+    background-color: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.left-panel {
+    flex: 1;
+    background: linear-gradient(135deg, #e60000 0%, #ff4d4d 100%);
+    color: #fff;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.left-panel .content {
+    max-width: 80%;
+}
+
+.left-panel h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.left-panel p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+
+.features {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.feature i {
+    font-size: 1.5rem;
+}
+
+.right-panel {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-container, .signup-container {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 20px;
+    background-image: url('../images/logo.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #e60000;
+    box-shadow: 0 0 0 2px rgba(230, 0, 0, 0.2);
+}
+
+.user-type-selector {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.option {
+    flex: 1;
+    margin: 0 5px;
+}
+
+.option input[type="radio"] {
+    display: none;
+}
+
+.option label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background-color: #f0f2f5;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.option label i {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.option input[type="radio"]:checked + label {
+    background-color: #e60000;
+    color: #fff;
+}
+
+button {
+    width: 100%;
+    background-color: #e60000;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+button:hover {
+    background-color: #cc0000;
+    transform: translateY(-2px);
+}
+
+.signup-link, .login-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.signup-link a, .login-link a {
+    color: #e60000;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signup-link a:hover, .login-link a:hover {
+    text-decoration: underline;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+        width: 95%;
+        max-width: 450px;
+        margin: 20px auto;
+    }
+
+    .left-panel {
+        display: none;
+    }
+
+    .right-panel {
+        padding: 30px 20px;
+    }
+
+    .login-container, .signup-container {
+        max-width: 100%;
+    }
+
+    .user-type-selector {
+        flex-direction: row;
+    }
+
+    .option {
+        flex: 1;
+    }
+
+    .option label {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+
+    .option label i {
+        font-size: 1.2rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        padding: 10px 10px 10px 35px;
+        font-size: 0.9rem;
+    }
+
+    .input-group i {
+        left: 12px;
+        font-size: 0.9rem;
+    }
+
+    button {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .user-type-selector {
+        flex-direction: column;
+    }
+
+    .option {
+        margin-bottom: 10px;
+    }
+
+    .option label {
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+    }
+}
+
+.loader {
+    width: 84px;
+    height: 84px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    display: none; /* Hidden by default */
+    z-index: 9999;
+}
+
+.loader:before, .loader:after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #e74c3c; /* Red color */
+    transform: translate(-50%, 100%) scale(0);
+    animation: push 2s infinite ease-in;
+}
+
+.loader:after {
+    animation-delay: 1s;
+}
+
+@keyframes push {
+    0% {
+        transform: translate(-50%, 100%) scale(1);
+    }
+    15%, 25% {
+        transform: translate(-50%, 50%) scale(1);
+    }
+    50%, 75% {
+        transform: translate(-50%, -30%) scale(0.5);
+    }
+    80%, 100% {
+        transform: translate(-50%, -50%) scale(0);
+    }
+}
+
+/* ... existing styles ... */
+
+/* Add these media queries at the end of your CSS file */
+
+@media screen and (max-width: 1024px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+        max-width: 90%;
+        margin: 20px auto;
+    }
+
+    .left-panel, .right-panel {
+        width: 100%;
+    }
+
+    .left-panel {
+        padding: 2rem;
+        min-height: 300px;
+    }
+
+    .right-panel {
+        padding: 2rem;
+    }
+
+    .login-container, .signup-container {
+        max-width: 100%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+
+    .container {
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .left-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 2rem 1rem;
+    }
+
+    .left-panel .content {
+        max-width: 100%;
+    }
+
+    .left-panel h1 {
+        font-size: 2rem;
+    }
+
+    .features {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .feature {
+        width: 45%;
+        margin-bottom: 1rem;
+    }
+
+    .user-type-selector {
+        flex-direction: row;
+    }
+
+    .option {
+        flex: 1;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        padding: 12px 12px 12px 40px;
+        font-size: 1rem;
+    }
+
+    .input-group i {
+        left: 15px;
+        font-size: 1rem;
+    }
+
+    button {
+        padding: 12px;
+        font-size: 1rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .left-panel h1 {
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .features {
+        flex-direction: column;
+    }
+
+    .feature {
+        width: 100%;
+    }
+
+    .user-type-selector {
+        flex-direction: column;
+    }
+
+    .option {
+        margin-bottom: 0.5rem;
+    }
+
+    .option label {
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .option label i {
+        font-size: 1.2rem;
+    }
+}
+
+.custom-alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f44336;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: none;
+    animation: fadeIn 0.5s, fadeOut 0.5s 2.5s;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes fadeOut {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
