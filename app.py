@@ -1,35 +1,42 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_mysqldb import MySQL
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
-from flask_migrate import Migrate
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key_here'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bloodbridge.db'
-db = SQLAlchemy(app)
-login_manager = LoginManager(app)
+
+# MySQL Configuration
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'your_username'
+app.config['MYSQL_PASSWORD'] = 'your_password'
+app.config['MYSQL_DB'] = 'bloodbridge'
+
+# Initialize MySQL
+mysql = MySQL(app)
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
 login_manager.login_view = 'login'
-migrate = Migrate(app, db)
 
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    fullname = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    user_type = db.Column(db.String(20), nullable=False)
+app.config['SECRET_KEY'] = 'your_secret_key_here'  # Change this to a random secret key
 
-class Donation(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    donation_date = db.Column(db.DateTime, nullable=False)
-    blood_type = db.Column(db.String(10), nullable=False)
-    amount = db.Column(db.Float, nullable=False)
+class User(UserMixin):
+    def __init__(self, id, fullname, email, user_type):
+        self.id = id
+        self.fullname = fullname
+        self.email = email
+        self.user_type = user_type
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    user = cur.fetchone()
+    cur.close()
+    if user:
+        return User(user[0], user[1], user[2], user[4])
+    return None
 
 @app.route('/')
 def index():
@@ -38,19 +45,23 @@ def index():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        fullname = request.form.get('fullname')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        user_type = request.form.get('user_type')
+        fullname = request.form['fullname']
+        email = request.form['email']
+        password = request.form['password']
+        user_type = request.form['user_type']
 
-        user = User.query.filter_by(email=email).first()
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+        user = cur.fetchone()
         if user:
             flash('Email already exists.', 'error')
             return redirect(url_for('signup'))
 
-        new_user = User(fullname=fullname, email=email, password=generate_password_hash(password, method='sha256'), user_type=user_type)
-        db.session.add(new_user)
-        db.session.commit()
+        hashed_password = generate_password_hash(password, method='sha256')
+        cur.execute("INSERT INTO users (fullname, email, password, user_type) VALUES (%s, %s, %s, %s)",
+                    (fullname, email, hashed_password, user_type))
+        mysql.connection.commit()
+        cur.close()
 
         flash('Account created successfully!', 'success')
         return redirect(url_for('login'))
@@ -60,15 +71,21 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        user = User.query.filter_by(email=email).first()
+        email = request.form['email']
+        password = request.form['password']
+        user_type = request.form['user_type']
 
-        if user and check_password_hash(user.password, password):
-            login_user(user)
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM users WHERE email = %s AND user_type = %s", (email, user_type))
+        user = cur.fetchone()
+        cur.close()
+
+        if user and check_password_hash(user[3], password):
+            user_obj = User(user[0], user[1], user[2], user[4])
+            login_user(user_obj)
             return redirect(url_for('dashboard'))
         else:
-            flash('Invalid email or password.', 'error')
+            flash('Invalid email, password, or user type.', 'error')
 
     return render_template('login.html')
 
@@ -81,33 +98,15 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    donations = Donation.query.filter_by(user_id=current_user.id).order_by(Donation.donation_date.desc()).limit(5).all()
-    return render_template('dashboard.html', user=current_user, donations=donations)
-
-@app.route('/schedule_donation', methods=['GET', 'POST'])
-@login_required
-def schedule_donation():
-    if request.method == 'POST':
-        donation_date = datetime.strptime(request.form.get('donation_date'), '%Y-%m-%d')
-        blood_type = request.form.get('blood_type')
-        amount = float(request.form.get('amount'))
-
-        new_donation = Donation(user_id=current_user.id, donation_date=donation_date, blood_type=blood_type, amount=amount)
-        db.session.add(new_donation)
-        db.session.commit()
-
-        flash('Donation scheduled successfully!', 'success')
-        return redirect(url_for('dashboard'))
-    
-    return render_template('schedule_donation.html')
-
-@app.route('/donation_history')
-@login_required
-def donation_history():
-    donations = Donation.query.filter_by(user_id=current_user.id).order_by(Donation.donation_date.desc()).all()
-    return render_template('donation_history.html', donations=donations)
+    if current_user.user_type == 'admin':
+        return render_template('dashboards/admin_dashboard.html')
+    elif current_user.user_type == 'donor':
+        return render_template('dashboards/donor_dashboard.html')
+    elif current_user.user_type == 'manager':
+        return render_template('dashboards/manager_dashboard.html')
+    else:
+        flash('Invalid user type.', 'error')
+        return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
