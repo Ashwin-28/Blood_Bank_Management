@@ -775,3 +775,89 @@ section {
     from {opacity: 1;}
     to {opacity: 0;}
 }
+
+.responded {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Emergency Request Form Styles */
+#emergency-request-form {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+#emergency-request-form h3 {
+    color: #e60000;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+#emergency-request-form .form-group {
+    margin-bottom: 20px;
+}
+
+#emergency-request-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+#emergency-request-form select,
+#emergency-request-form input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#emergency-request-form select:focus,
+#emergency-request-form input[type="number"]:focus {
+    border-color: #e60000;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(230, 0, 0, 0.25);
+}
+
+#emergency-request-form .checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#emergency-request-form .checkbox-group input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+#emergency-request-form .checkbox-group label {
+    font-weight: normal;
+    color: #e60000;
+}
+
+#emergency-request-form button[type="submit"] {
+    background-color: #e60000;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    width: 100%;
+}
+
+#emergency-request-form button[type="submit"]:hover {
+    background-color: #cc0000;
+}
+
+#emergency-request-form button[type="submit"]:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(230, 0, 0, 0.5);
+}

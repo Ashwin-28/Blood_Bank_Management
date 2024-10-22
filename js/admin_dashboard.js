@@ -42,18 +42,43 @@ function updateRequestsTable() {
             <td>${request.status}</td>
             <td>${request.donorResponses ? request.donorResponses.length : 'N/A'}</td>
             <td>
-                ${request.status === 'Pending' || request.status === 'Donor Found' || request.status === 'Urgent' ? 
-                    `<button onclick="approveRequest(${request.id})" class="action-button approve-button">Approve</button>
-                     <button onclick="rejectRequest(${request.id})" class="action-button reject-button">Reject</button>` : 
-                    `<button onclick="deleteRequest(${request.id})" class="action-button delete-button">Delete</button>`}
+                ${getActionButtons(request)}
             </td>
         `;
         tableBody.appendChild(row);
     });
+
+    // Add event listeners to action buttons
+    addActionButtonListeners();
+}
+
+function getActionButtons(request) {
+    if (request.status === 'Pending' || request.status === 'Donor Found' || request.status === 'Urgent') {
+        return `
+            <button class="action-button approve-button" data-id="${request.id}">Approve</button>
+            <button class="action-button reject-button" data-id="${request.id}">Reject</button>
+        `;
+    } else {
+        return `<button class="action-button delete-button" data-id="${request.id}">Delete</button>`;
+    }
+}
+
+function addActionButtonListeners() {
+    document.querySelectorAll('.approve-button').forEach(button => {
+        button.addEventListener('click', () => approveRequest(button.dataset.id));
+    });
+
+    document.querySelectorAll('.reject-button').forEach(button => {
+        button.addEventListener('click', () => rejectRequest(button.dataset.id));
+    });
+
+    document.querySelectorAll('.delete-button').forEach(button => {
+        button.addEventListener('click', () => deleteRequest(button.dataset.id));
+    });
 }
 
 function approveRequest(requestId) {
-    const request = findRequest(requestId);
+    const request = findRequest(parseInt(requestId));
     if (request) {
         request.status = 'Approved';
         SharedData.inventory[request.bloodType] -= request.quantity;
@@ -66,7 +91,7 @@ function approveRequest(requestId) {
 }
 
 function rejectRequest(requestId) {
-    const request = findRequest(requestId);
+    const request = findRequest(parseInt(requestId));
     if (request) {
         request.status = 'Rejected';
         SharedData.saveData();
@@ -80,7 +105,7 @@ function rejectRequest(requestId) {
 function deleteRequest(requestId) {
     const requestArrays = [SharedData.bloodRequests, SharedData.pastRequests, SharedData.urgentRequests, SharedData.emergencyRequests];
     for (let array of requestArrays) {
-        const index = array.findIndex(r => r.id === requestId);
+        const index = array.findIndex(r => r.id === parseInt(requestId));
         if (index !== -1) {
             array.splice(index, 1);
             SharedData.saveData();
@@ -118,9 +143,9 @@ function updateInventoryTable() {
 
 function submitEmergencyRequest(e) {
     e.preventDefault();
-    const bloodType = e.target.elements['blood-type'].value;
-    const quantity = parseInt(e.target.elements['quantity'].value);
-    const isUrgent = e.target.elements['urgent'].checked;
+    const bloodType = document.getElementById('blood-type').value;
+    const quantity = document.getElementById('quantity').value;
+    const isUrgent = document.getElementById('urgent').checked;
     const hospitalName = localStorage.getItem('hospitalName') || "Unknown Hospital"; // You should set this when the admin logs in
 
     if (isUrgent) {
@@ -133,6 +158,9 @@ function submitEmergencyRequest(e) {
 
     updateDashboard();
     e.target.reset();
+
+    // Dispatch the event
+    window.dispatchEvent(new CustomEvent('bloodBridgeDataUpdated', { detail: SharedData }));
 }
 
 function showNotification(message, type = 'success') {

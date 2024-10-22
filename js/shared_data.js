@@ -84,6 +84,7 @@ const SharedData = {
     },
 
     saveData() {
+        console.log("Saving data to localStorage");
         localStorage.setItem('bloodBridgeData', JSON.stringify({
             inventory: this.inventory,
             bloodRequests: this.bloodRequests,
@@ -99,9 +100,11 @@ const SharedData = {
         this.notifyListeners();
         // Dispatch a custom event to notify other tabs/windows
         window.dispatchEvent(new CustomEvent('bloodBridgeDataUpdated', { detail: this }));
+        console.log("Data saved and event dispatched");
     },
 
     addEmergencyRequest(bloodType, quantity, hospitalName) {
+        console.log("Adding emergency request:", bloodType, quantity, hospitalName);
         const newRequest = {
             id: this.emergencyRequests.length + 1,
             bloodType: bloodType,
@@ -118,8 +121,12 @@ const SharedData = {
             id: this.emergencyNotifications.length + 1,
             message: `Emergency request for ${quantity} units of ${bloodType} blood from ${hospitalName}`,
             date: new Date().toISOString(),
-            requestId: newRequest.id
+            requestId: newRequest.id,
+            timestamp: new Date().getTime()
         });
+
+        console.log("Emergency requests after adding:", this.emergencyRequests);
+        console.log("Emergency notifications after adding:", this.emergencyNotifications);
 
         this.saveData();
     },
@@ -138,9 +145,6 @@ const SharedData = {
                 request.status = 'Donor Found';
             }
 
-            // Remove the notification
-            this.emergencyNotifications = this.emergencyNotifications.filter(n => n.requestId !== requestId);
-
             this.saveData();
             return true;
         }
@@ -148,6 +152,7 @@ const SharedData = {
     },
 
     addUrgentRequest(bloodType, quantity, hospitalName) {
+        console.log("Adding urgent request:", bloodType, quantity, hospitalName);
         const newRequest = {
             id: this.urgentRequests.length + 1,
             bloodType: bloodType,
@@ -165,8 +170,12 @@ const SharedData = {
             message: `URGENT: ${quantity} units of ${bloodType} blood needed at ${hospitalName}`,
             date: new Date().toISOString(),
             requestId: newRequest.id,
-            isUrgent: true
+            isUrgent: true,
+            timestamp: new Date().getTime()
         });
+
+        console.log("Urgent requests after adding:", this.urgentRequests);
+        console.log("Emergency notifications after adding:", this.emergencyNotifications);
 
         this.saveData();
     },
@@ -179,6 +188,33 @@ const SharedData = {
     addOutgoingBlood(entry) {
         this.outgoingBlood.push(entry);
         this.saveData();
+    },
+
+    hasUserResponded(requestId, userEmail) {
+        const request = this.findRequest(requestId);
+        return request && request.donorResponses && request.donorResponses.includes(userEmail);
+    },
+
+    findRequest(requestId) {
+        const allRequests = [
+            ...this.bloodRequests,
+            ...this.pastRequests,
+            ...this.urgentRequests,
+            ...this.emergencyRequests
+        ];
+        return allRequests.find(request => request.id === requestId);
+    },
+
+    addEmergencyNotification(message, requestId, isUrgent) {
+        this.emergencyNotifications.push({
+            message,
+            requestId,
+            isUrgent,
+            date: new Date(),
+            timestamp: new Date().getTime()
+        });
+        this.saveData();
+        console.log("Added new emergency notification:", this.emergencyNotifications[this.emergencyNotifications.length - 1]);
     }
 };
 

@@ -16,6 +16,10 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('bloodBridgeDataUpdated', (event) => {
         loadEmergencyNotifications();
     });
+
+    console.log("Shared Data on load:", SharedData);
+    SharedData.loadData();
+    console.log("Shared Data after loading:", SharedData);
 });
 
 function loadDonationHistory() {
@@ -56,7 +60,7 @@ function loadUpcomingDrives() {
         const li = document.createElement('li');
         li.innerHTML = `
             <strong>${drive.date}</strong> - ${drive.location}
-            <button onclick="registerForDrive('${drive.date}', '${drive.location}')">Register</button>
+            <button onclick="registerForDrive(this, '${drive.date}', '${drive.location}')">Register</button>
         `;
         drivesList.appendChild(li);
     });
@@ -76,28 +80,65 @@ function loadDonationCenters() {
 }
 
 function loadEmergencyNotifications() {
+    console.log("Loading emergency notifications...");
     const notifications = SharedData.emergencyNotifications;
-    const notificationsList = document.getElementById('emergency-notifications');
+    console.log("Notifications:", notifications);
+
+    let notificationsList = document.getElementById('emergency-notifications');
+    const donorEmail = localStorage.getItem('userEmail');
+    const currentTime = new Date().getTime();
     
     if (!notificationsList) {
+        console.log("Creating new notifications section");
         const section = document.createElement('section');
         section.id = 'emergency-notifications';
         section.innerHTML = '<h2>Emergency Notifications</h2><ul></ul>';
         document.querySelector('main').prepend(section);
+        notificationsList = section;
     }
     
-    const list = document.querySelector('#emergency-notifications ul');
+    const list = notificationsList.querySelector('ul');
     list.innerHTML = '';
 
-    notifications.forEach(notification => {
-        const li = document.createElement('li');
-        li.classList.add(notification.isUrgent ? 'urgent' : 'normal');
-        li.innerHTML = `
-            <strong>${new Date(notification.date).toLocaleString()}</strong> - ${notification.message}
-            <button onclick="respondToEmergency(${notification.requestId}, ${notification.isUrgent})">Respond</button>
-        `;
-        list.appendChild(li);
-    });
+    if (notifications.length > 0) {
+        console.log("There are notifications to display");
+        notifications.forEach(notification => {
+            console.log("Processing notification:", notification);
+            // Only show notifications that are less than 24 hours old
+            if (currentTime - notification.timestamp < 24 * 60 * 60 * 1000) {
+                const li = document.createElement('li');
+                li.classList.add(notification.isUrgent ? 'urgent' : 'normal');
+                
+                // Check if the user has already responded to this request
+                const hasResponded = SharedData.hasUserResponded(notification.requestId, donorEmail);
+                
+                li.innerHTML = `
+                    <strong>${new Date(notification.date).toLocaleString()}</strong> - ${notification.message}
+                    ${hasResponded ? 
+                        '<span class="responded">Responded</span>' : 
+                        `<button onclick="respondToEmergency(this, ${notification.requestId}, ${notification.isUrgent})">Respond</button>`
+                    }
+                `;
+                list.appendChild(li);
+                console.log("Added notification to list");
+            } else {
+                console.log("Notification is older than 24 hours, skipping");
+            }
+        });
+    } else {
+        console.log("No notifications to display");
+        list.innerHTML = '<li>No current emergency requests.</li>';
+    }
+    
+    // Don't remove the notifications section even if it's empty
+    if (notificationsList) {
+        if (notificationsList.querySelector('ul').children.length === 0) {
+            console.log("No current emergency requests, displaying message");
+            notificationsList.querySelector('ul').innerHTML = '<li>No current emergency requests.</li>';
+        }
+    } else {
+        console.log("Notifications list not found in DOM");
+    }
 }
 
 function showAlert(message) {
@@ -125,22 +166,49 @@ function scheduleDonation(e) {
     // Simulated API call - replace with actual API call
     console.log(`Donation scheduled for ${date} at ${center}`);
     showAlert('Donation scheduled successfully!');
+    
+    // Clear the form
     e.target.reset();
 }
 
-function registerForDrive(date, location) {
+function registerForDrive(button, date, location) {
     // Simulated API call - replace with actual API call
     console.log(`Registered for blood drive on ${date} at ${location}`);
     showAlert(`Successfully registered for blood drive on ${date} at ${location}`);
+    
+    // Remove the button
+    button.remove();
 }
 
-function respondToEmergency(requestId, isUrgent) {
+function respondToEmergency(button, requestId, isUrgent) {
     const donorEmail = localStorage.getItem('userEmail');
     
     if (SharedData.respondToEmergency(requestId, donorEmail)) {
         showAlert('Thank you for responding to the request. The hospital will contact you shortly with further instructions.');
-        loadEmergencyNotifications(); // Refresh the notifications list
+        
+        // Replace the button with "Responded" text
+        const listItem = button.closest('li');
+        if (listItem) {
+            // Remove the button
+            button.remove();
+            
+            // Create and add the "Responded" text
+            const respondedSpan = document.createElement('span');
+            respondedSpan.className = 'responded';
+            respondedSpan.textContent = 'Responded';
+            listItem.appendChild(respondedSpan);
+        }
+        
+        // Refresh the notifications to update any changes
+        loadEmergencyNotifications();
     } else {
         showAlert('You have already responded to this request or the request is no longer available.');
     }
 }
+
+// Add this at the end of the file
+setInterval(() => {
+    console.log("Periodic check for notifications");
+    SharedData.loadData();
+    loadEmergencyNotifications();
+}, 30000); // Check every 30 seconds
