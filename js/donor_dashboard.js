@@ -100,6 +100,23 @@ function loadEmergencyNotifications() {
     });
 }
 
+function showAlert(message) {
+    const alertElement = document.createElement('div');
+    alertElement.className = 'custom-alert';
+    alertElement.textContent = message;
+    document.body.appendChild(alertElement);
+    
+    // Show the alert
+    setTimeout(() => {
+        alertElement.style.display = 'block';
+    }, 100);
+
+    // Remove the alert after 3 seconds
+    setTimeout(() => {
+        alertElement.remove();
+    }, 3000);
+}
+
 function scheduleDonation(e) {
     e.preventDefault();
     const date = e.target.elements['donation-date'].value;
@@ -107,23 +124,23 @@ function scheduleDonation(e) {
 
     // Simulated API call - replace with actual API call
     console.log(`Donation scheduled for ${date} at ${center}`);
-    alert('Donation scheduled successfully!');
+    showAlert('Donation scheduled successfully!');
     e.target.reset();
 }
 
 function registerForDrive(date, location) {
     // Simulated API call - replace with actual API call
     console.log(`Registered for blood drive on ${date} at ${location}`);
-    alert(`Successfully registered for blood drive on ${date} at ${location}`);
+    showAlert(`Successfully registered for blood drive on ${date} at ${location}`);
 }
 
 function respondToEmergency(requestId, isUrgent) {
     const donorEmail = localStorage.getItem('userEmail');
     
     if (SharedData.respondToEmergency(requestId, donorEmail)) {
-        alert('Thank you for responding to the request. The hospital will contact you shortly with further instructions.');
+        showAlert('Thank you for responding to the request. The hospital will contact you shortly with further instructions.');
         loadEmergencyNotifications(); // Refresh the notifications list
     } else {
-        alert('You have already responded to this request or the request is no longer available.');
+        showAlert('You have already responded to this request or the request is no longer available.');
     }
 }
