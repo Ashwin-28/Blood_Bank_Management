@@ -6,37 +6,57 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
+    // Display the donor's name
+    const welcomeMessage = document.createElement('h2');
+    welcomeMessage.textContent = `Welcome, ${currentUser.fullname}!`;
+    document.querySelector('main').prepend(welcomeMessage);
+
     loadDonationHistory();
     loadUpcomingDrives();
     loadDonationCenters();
     loadEmergencyNotifications();
-    document.getElementById('schedule-donation-form').addEventListener('submit', scheduleDonation);
-    
-    // Add event listener for emergency notifications
-    window.addEventListener('bloodBridgeDataUpdated', (event) => {
-        loadEmergencyNotifications();
-    });
 
-    console.log("Shared Data on load:", SharedData);
-    SharedData.loadData();
-    console.log("Shared Data after loading:", SharedData);
+    const clearButton = document.getElementById('clear-notifications');
+    clearButton.addEventListener('click', clearAllNotifications);
+
+    // Refresh notifications every 30 seconds
+    setInterval(loadEmergencyNotifications, 30000);
 });
 
 function loadDonationHistory() {
-    // Simulated data - replace with actual API call
-    const history = [
-        { date: '2023-05-15', location: 'City Hospital', bloodType: 'A+', quantity: 1 },
-        { date: '2023-02-10', location: 'Red Cross Center', bloodType: 'A+', quantity: 1 },
-        { date: '2022-11-05', location: 'Community Clinic', bloodType: 'A+', quantity: 1 },
-    ];
+    const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    const locations = ['City Hospital', 'Red Cross Center', 'Community Clinic', 'University Medical Center', 'Downtown Blood Bank'];
+    
+    // Generate a random blood type for this donor
+    const donorBloodType = bloodTypes[Math.floor(Math.random() * bloodTypes.length)];
+    
+    // Generate 5-10 random donation entries
+    const historyCount = Math.floor(Math.random() * 6) + 5;
+    const history = [];
+
+    for (let i = 0; i < historyCount; i++) {
+        const date = new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000); // Random date within the last year
+        history.push({
+            date: date.toISOString(),
+            location: locations[Math.floor(Math.random() * locations.length)],
+            bloodType: donorBloodType, // Use the same blood type for all entries
+            quantity: Math.random() < 0.9 ? 1 : 2 // 90% chance of donating 1 unit, 10% chance of 2 units
+        });
+    }
+
+    // Sort history by date, most recent first
+    history.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     const tableBody = document.querySelector('#history-table tbody');
     tableBody.innerHTML = '';
 
     history.forEach(donation => {
+        const donationDate = new Date(donation.date);
+        const formattedDate = `${donationDate.toLocaleDateString()} ${donationDate.toLocaleTimeString()}`;
+        
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${donation.date}</td>
+            <td>${formattedDate}</td>
             <td>${donation.location}</td>
             <td>${donation.bloodType}</td>
             <td>${donation.quantity}</td>
@@ -46,20 +66,32 @@ function loadDonationHistory() {
 }
 
 function loadUpcomingDrives() {
-    // Simulated data - replace with actual API call
-    const drives = [
-        { date: '2023-06-01', location: 'City Hall' },
-        { date: '2023-06-15', location: 'University Campus' },
-        { date: '2023-07-02', location: 'Shopping Mall' },
-    ];
+    const locations = ['City Hall', 'University Campus', 'Shopping Mall', 'Community Center', 'Local Church', 'Public Library', 'High School Gymnasium'];
+    
+    // Generate 3-7 random upcoming drives
+    const drivesCount = Math.floor(Math.random() * 5) + 3;
+    const drives = [];
+
+    for (let i = 0; i < drivesCount; i++) {
+        const date = new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000); // Random date within the next 30 days
+        drives.push({
+            date: date.toISOString().split('T')[0], // Format as YYYY-MM-DD
+            location: locations[Math.floor(Math.random() * locations.length)]
+        });
+    }
+
+    // Sort drives by date
+    drives.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const drivesList = document.getElementById('drives-list');
     drivesList.innerHTML = '';
 
     drives.forEach(drive => {
         const li = document.createElement('li');
+        const driveDate = new Date(drive.date);
+        const formattedDate = driveDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         li.innerHTML = `
-            <strong>${drive.date}</strong> - ${drive.location}
+            <strong>${formattedDate}</strong> - ${drive.location}
             <button onclick="registerForDrive(this, '${drive.date}', '${drive.location}')">Register</button>
         `;
         drivesList.appendChild(li);
@@ -81,80 +113,60 @@ function loadDonationCenters() {
 
 function loadEmergencyNotifications() {
     console.log("Loading emergency notifications...");
+    SharedData.loadData(); // Make sure to load the latest data
     const notifications = SharedData.emergencyNotifications;
     console.log("Notifications:", notifications);
 
-    let notificationsList = document.getElementById('emergency-notifications');
-    const donorEmail = localStorage.getItem('userEmail');
-    const currentTime = new Date().getTime();
-    
-    if (!notificationsList) {
-        console.log("Creating new notifications section");
-        const section = document.createElement('section');
-        section.id = 'emergency-notifications';
-        section.innerHTML = '<h2>Emergency Notifications</h2><ul></ul>';
-        document.querySelector('main').prepend(section);
-        notificationsList = section;
-    }
-    
-    const list = notificationsList.querySelector('ul');
-    list.innerHTML = '';
+    const notificationsList = document.querySelector('#emergency-notifications ul');
+    const clearButton = document.getElementById('clear-notifications');
+    notificationsList.innerHTML = '';
 
-    if (notifications.length > 0) {
-        console.log("There are notifications to display");
-        notifications.forEach(notification => {
-            console.log("Processing notification:", notification);
-            // Only show notifications that are less than 24 hours old
-            if (currentTime - notification.timestamp < 24 * 60 * 60 * 1000) {
-                const li = document.createElement('li');
-                li.classList.add(notification.isUrgent ? 'urgent' : 'normal');
-                
-                // Check if the user has already responded to this request
-                const hasResponded = SharedData.hasUserResponded(notification.requestId, donorEmail);
-                
-                li.innerHTML = `
-                    <strong>${new Date(notification.date).toLocaleString()}</strong> - ${notification.message}
-                    ${hasResponded ? 
-                        '<span class="responded">Responded</span>' : 
-                        `<button onclick="respondToEmergency(this, ${notification.requestId}, ${notification.isUrgent})">Respond</button>`
-                    }
-                `;
-                list.appendChild(li);
-                console.log("Added notification to list");
-            } else {
-                console.log("Notification is older than 24 hours, skipping");
-            }
-        });
-    } else {
-        console.log("No notifications to display");
-        list.innerHTML = '<li>No current emergency requests.</li>';
-    }
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const donorEmail = currentUser ? currentUser.email : null;
     
-    // Don't remove the notifications section even if it's empty
-    if (notificationsList) {
-        if (notificationsList.querySelector('ul').children.length === 0) {
-            console.log("No current emergency requests, displaying message");
-            notificationsList.querySelector('ul').innerHTML = '<li>No current emergency requests.</li>';
-        }
+    notifications.forEach(notification => {
+        console.log("Processing notification:", notification);
+        const li = document.createElement('li');
+        li.classList.add(notification.isUrgent ? 'urgent' : 'normal');
+        
+        const hasResponded = SharedData.hasUserResponded(notification.requestId, donorEmail);
+        
+        const notificationDate = new Date(notification.date);
+        const formattedDate = `${notificationDate.toLocaleDateString()} ${notificationDate.toLocaleTimeString()}`;
+        
+        li.innerHTML = `
+            <strong>${formattedDate}</strong> - ${notification.message}
+            ${hasResponded ? 
+                '<span style="color: #4CAF50; font-weight: bold;">Responded</span>' : 
+                `<button onclick="respondToEmergency(this, '${notification.requestId}', ${notification.isUrgent})">Respond</button>`
+            }
+        `;
+        notificationsList.appendChild(li);
+    });
+
+    if (notifications.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No current emergency requests.';
+        notificationsList.appendChild(li);
+        clearButton.disabled = true;
     } else {
-        console.log("Notifications list not found in DOM");
+        clearButton.disabled = false;
     }
 }
 
-function showAlert(message) {
-    const alertElement = document.createElement('div');
-    alertElement.className = 'custom-alert';
-    alertElement.textContent = message;
-    document.body.appendChild(alertElement);
-    
-    // Show the alert
-    setTimeout(() => {
-        alertElement.style.display = 'block';
-    }, 100);
+function showAlert(message, isPositive = true) {
+    const alertBox = document.createElement('div');
+    alertBox.className = `custom-alert ${isPositive ? 'positive' : 'negative'}`;
+    alertBox.textContent = message;
+    document.body.appendChild(alertBox);
 
-    // Remove the alert after 3 seconds
+    // Show the alert
+    setTimeout(() => alertBox.classList.add('show'), 10);
+
+    // Automatically close after 3 seconds
     setTimeout(() => {
-        alertElement.remove();
+        alertBox.classList.remove('show');
+        setTimeout(() => alertBox.remove(), 500);
     }, 3000);
 }
 
@@ -181,29 +193,36 @@ function registerForDrive(button, date, location) {
 }
 
 function respondToEmergency(button, requestId, isUrgent) {
-    const donorEmail = localStorage.getItem('userEmail');
-    
-    if (SharedData.respondToEmergency(requestId, donorEmail)) {
-        showAlert('Thank you for responding to the request. The hospital will contact you shortly with further instructions.');
-        
-        // Replace the button with "Responded" text
-        const listItem = button.closest('li');
-        if (listItem) {
-            // Remove the button
-            button.remove();
-            
-            // Create and add the "Responded" text
-            const respondedSpan = document.createElement('span');
-            respondedSpan.className = 'responded';
-            respondedSpan.textContent = 'Responded';
-            listItem.appendChild(respondedSpan);
-        }
-        
-        // Refresh the notifications to update any changes
-        loadEmergencyNotifications();
-    } else {
-        showAlert('You have already responded to this request or the request is no longer available.');
+    console.log("Responding to emergency:", requestId, isUrgent);
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+        showAlert('Please log in to respond to emergency requests.');
+        return;
     }
+
+    // Immediately change the button to "Responded" text
+    const respondedSpan = document.createElement('span');
+    respondedSpan.textContent = 'Responded';
+    respondedSpan.style.color = '#4CAF50'; // Green color
+    respondedSpan.style.fontWeight = 'bold';
+    button.parentNode.replaceChild(respondedSpan, button);
+
+    // Then process the response
+    if (SharedData.respondToEmergency(requestId, currentUser.email, currentUser.fullname)) {
+        console.log("Successfully responded to emergency");
+        showAlert('Thank you for responding to the request. The hospital will contact you shortly with further instructions.');
+    } else {
+        console.log("Failed to respond to emergency");
+        showAlert('An error occurred while processing your response. Please try again later.');
+        // If the response fails, you might want to revert the button, but for now we'll leave it as "Responded"
+    }
+}
+
+function clearAllNotifications() {
+    SharedData.emergencyNotifications = [];
+    SharedData.saveData();
+    loadEmergencyNotifications();
+    showAlert('All notifications have been cleared.', true);
 }
 
 // Add this at the end of the file

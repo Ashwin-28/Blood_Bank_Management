@@ -137,8 +137,12 @@ const SharedData = {
             request = this.emergencyRequests.find(r => r.id === requestId);
         }
 
-        if (request && !request.donorResponses.includes(donorEmail)) {
-            request.donorResponses.push(donorEmail);
+        if (request && !request.donorResponses.some(response => response.email === donorEmail)) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const donor = users.find(user => user.email === donorEmail);
+            const donorName = donor ? donor.fullname : 'Unknown Donor';
+
+            request.donorResponses.push({ email: donorEmail, name: donorName });
             
             // If this is the first response, update the status
             if (request.donorResponses.length === 1) {

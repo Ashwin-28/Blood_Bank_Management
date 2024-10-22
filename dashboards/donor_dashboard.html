@@ -22,19 +22,21 @@
     <main>
         <section id="donation-history">
             <h2>Donation History</h2>
-            <table id="history-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Location</th>
-                        <th>Blood Type</th>
-                        <th>Quantity</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Rows will be added dynamically -->
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table id="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Blood Type</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be added dynamically -->
+                    </tbody>
+                </table>
+            </div>
         </section>
         <section id="upcoming-drives">
             <h2>Upcoming Blood Drives</h2>
@@ -55,9 +57,12 @@
         </section>
         <section id="emergency-notifications">
             <h2>Emergency Notifications</h2>
-            <ul>
-                <!-- Emergency notifications will be added dynamically -->
-            </ul>
+            <button id="clear-notifications">Clear All Notifications</button>
+            <div class="notifications-container">
+                <ul>
+                    <!-- Emergency notifications will be added dynamically -->
+                </ul>
+            </div>
         </section>
     </main>
     <footer>

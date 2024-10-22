@@ -27,12 +27,12 @@ function updateRequestsTable() {
     const tableBody = document.querySelector('#requests-table tbody');
     tableBody.innerHTML = '';
 
-    const allRequests = [...SharedData.bloodRequests, ...SharedData.pastRequests, ...SharedData.urgentRequests, ...SharedData.emergencyRequests];
+    const allRequests = [...SharedData.urgentRequests, ...SharedData.emergencyRequests];
     allRequests.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date, most recent first
 
     allRequests.forEach(request => {
         const row = document.createElement('tr');
-        if (request.status === 'Urgent') {
+        if (request.isUrgent) {
             row.classList.add('urgent');
         }
         row.innerHTML = `
@@ -40,10 +40,9 @@ function updateRequestsTable() {
             <td>${request.bloodType}</td>
             <td>${request.quantity}</td>
             <td>${request.status}</td>
-            <td>${request.donorResponses ? request.donorResponses.length : 'N/A'}</td>
-            <td>
-                ${getActionButtons(request)}
-            </td>
+            <td>${request.donorResponses.length}</td>
+            <td>${request.donorResponses.map(donor => donor.name).join(', ')}</td>
+            <td>${request.hospitalName}</td>
         `;
         tableBody.appendChild(row);
     });
@@ -103,7 +102,7 @@ function rejectRequest(requestId) {
 }
 
 function deleteRequest(requestId) {
-    const requestArrays = [SharedData.bloodRequests, SharedData.pastRequests, SharedData.urgentRequests, SharedData.emergencyRequests];
+    const requestArrays = [SharedData.urgentRequests, SharedData.emergencyRequests];
     for (let array of requestArrays) {
         const index = array.findIndex(r => r.id === parseInt(requestId));
         if (index !== -1) {
@@ -118,7 +117,7 @@ function deleteRequest(requestId) {
 }
 
 function findRequest(requestId) {
-    const requestArrays = [SharedData.bloodRequests, SharedData.pastRequests, SharedData.urgentRequests, SharedData.emergencyRequests];
+    const requestArrays = [SharedData.urgentRequests, SharedData.emergencyRequests];
     for (let array of requestArrays) {
         const request = array.find(r => r.id === requestId);
         if (request) return request;
@@ -146,21 +145,13 @@ function submitEmergencyRequest(e) {
     const bloodType = document.getElementById('blood-type').value;
     const quantity = document.getElementById('quantity').value;
     const isUrgent = document.getElementById('urgent').checked;
-    const hospitalName = localStorage.getItem('hospitalName') || "Unknown Hospital"; // You should set this when the admin logs in
+    const hospitalName = localStorage.getItem('hospitalName') || "Unknown Hospital";
 
-    if (isUrgent) {
-        SharedData.addUrgentRequest(bloodType, quantity, hospitalName);
-        showNotification(`Urgent request for ${quantity} units of ${bloodType} blood submitted successfully! Notifying donors immediately.`);
-    } else {
-        SharedData.addEmergencyRequest(bloodType, quantity, hospitalName);
-        showNotification(`Emergency request for ${quantity} units of ${bloodType} blood submitted successfully! Notifying donors.`);
-    }
-
+    const newRequest = SharedData.addEmergencyRequest(bloodType, quantity, hospitalName, isUrgent);
+    
+    showNotification(`${isUrgent ? 'Urgent' : 'Emergency'} request for ${quantity} units of ${bloodType} blood submitted successfully!`);
     updateDashboard();
     e.target.reset();
-
-    // Dispatch the event
-    window.dispatchEvent(new CustomEvent('bloodBridgeDataUpdated', { detail: SharedData }));
 }
 
 function showNotification(message, type = 'success') {
@@ -186,3 +177,9 @@ function pollForUpdates() {
 
 // Poll for updates every 5 seconds
 setInterval(pollForUpdates, 5000);
+
+function addEmergencyNotification(message, requestId, isUrgent) {
+    SharedData.addEmergencyNotification(message, requestId, isUrgent);
+    SharedData.saveData();
+    console.log("Added new emergency notification:", message);
+}

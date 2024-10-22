@@ -749,21 +749,37 @@ section {
     }
 }
 
-/* Add these styles at the end of your CSS file */
-
+/* Custom Alert Styles */
 .custom-alert {
     position: fixed;
     top: 20px;
     left: 50%;
-    transform: translateX(-50%);
-    background-color: #f44336;
+    transform: translateX(-50%) translateY(-100px);
     color: white;
     padding: 15px 20px;
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     z-index: 1000;
-    display: none;
-    animation: fadeIn 0.5s, fadeOut 0.5s 2.5s;
+    opacity: 0;
+    transition: opacity 0.5s, transform 0.5s;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    text-align: center;
+    min-width: 200px;
+    max-width: 80%;
+}
+
+.custom-alert.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.custom-alert.positive {
+    background-color: #4CAF50; /* Green color for positive messages */
+}
+
+.custom-alert.negative {
+    background-color: #f44336; /* Red color for negative messages */
 }
 
 @keyframes fadeIn {
@@ -776,9 +792,49 @@ section {
     to {opacity: 0;}
 }
 
-.responded {
-    color: #4CAF50;
-    font-weight: bold;
+/* Alert types */
+.custom-alert.success {
+    border-left-color: #27ae60;
+}
+
+.custom-alert.error {
+    border-left-color: #c0392b;
+    background-color: #fadbd8;
+}
+
+.custom-alert.warning {
+    border-left-color: #f39c12;
+}
+
+.custom-alert.info {
+    border-left-color: #2980b9;
+}
+
+/* Add an icon to the alert */
+.custom-alert::before {
+    content: '\26A0'; /* Unicode for warning sign */
+    font-size: 20px;
+    margin-right: 15px;
+    color: #c0392b;
+}
+
+.custom-alert.success::before {
+    color: #27ae60;
+}
+
+.custom-alert.error::before {
+    content: '\2716'; /* Unicode for X mark */
+    color: #c0392b;
+}
+
+.custom-alert.warning::before {
+    content: '\26A0'; /* Unicode for warning sign */
+    color: #f39c12;
+}
+
+.custom-alert.info::before {
+    content: '\2139'; /* Unicode for information symbol */
+    color: #2980b9;
 }
 
 /* Emergency Request Form Styles */
@@ -860,4 +916,80 @@ section {
 #emergency-request-form button[type="submit"]:focus {
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(230, 0, 0, 0.5);
+}
+
+/* Add this to your existing CSS */
+#clear-notifications {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s;
+}
+
+#clear-notifications:hover {
+    background-color: #d32f2f;
+}
+
+#clear-notifications:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.table-container {
+    max-height: 300px; /* Adjust this value as needed */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+}
+
+#history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#history-table th {
+    position: sticky;
+    top: 0;
+    background-color: #f2f2f2;
+    z-index: 1;
+}
+
+#history-table th, #history-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#history-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#history-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.notifications-container {
+    max-height: 300px; /* Adjust this value as needed */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+#emergency-notifications ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#emergency-notifications li {
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+}
+
+#emergency-notifications li:last-child {
+    border-bottom: none;
 }
