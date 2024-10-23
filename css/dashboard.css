@@ -1336,13 +1336,13 @@ section {
 
 .approve-btn:hover {
     background-color: #308d34;
-    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 4px 8px rgba(11, 95, 14, 0.973);
     transform: translateY(-2px);
 }
 
 .reject-btn:hover {
     background-color: #da190b;
-    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.884);
     transform: translateY(-2px);
 }
 
