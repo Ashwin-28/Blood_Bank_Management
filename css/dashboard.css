@@ -839,83 +839,88 @@ section {
 
 /* Emergency Request Form Styles */
 #emergency-request-form {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 20px;
-    max-width: 500px;
+    max-width: 400px;
     margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 #emergency-request-form h3 {
-    color: #e60000;
+    margin-top: 0;
     margin-bottom: 20px;
-    font-size: 1.5rem;
+    color: #333;
+    text-align: center;
 }
 
-#emergency-request-form .form-group {
-    margin-bottom: 20px;
+#emergency-request-form input[type="text"],
+#emergency-request-form input[type="number"],
+#emergency-request-form select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#emergency-request-form input[type="text"]:focus,
+#emergency-request-form input[type="number"]:focus,
+#emergency-request-form select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+#emergency-request-form input[type="text"]::placeholder,
+#emergency-request-form input[type="number"]::placeholder {
+    color: #999;
+}
+
+#emergency-request-form select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 30px;
+}
+
+#emergency-request-form .checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+#emergency-request-form input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
 #emergency-request-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: #333;
-}
-
-#emergency-request-form select,
-#emergency-request-form input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
     font-size: 16px;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-#emergency-request-form select:focus,
-#emergency-request-form input[type="number"]:focus {
-    border-color: #e60000;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(230, 0, 0, 0.25);
-}
-
-#emergency-request-form .checkbox-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-#emergency-request-form .checkbox-group input[type="checkbox"] {
-    margin-right: 10px;
-}
-
-#emergency-request-form .checkbox-group label {
-    font-weight: normal;
     color: #e60000;
+    cursor: pointer;
 }
 
 #emergency-request-form button[type="submit"] {
+    width: 100%;
+    padding: 12px;
     background-color: #e60000;
     color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 16px;
-    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.15s ease-in-out;
-    width: 100%;
+    transition: background-color 0.3s ease;
 }
 
 #emergency-request-form button[type="submit"]:hover {
-    background-color: #cc0000;
-}
-
-#emergency-request-form button[type="submit"]:focus {
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(230, 0, 0, 0.5);
+    background-color: #e60000;
 }
 
 /* Add this to your existing CSS */
@@ -1350,3 +1355,55 @@ section {
     transform: translateY(0);
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+
+#emergency-request-form input[type="text"],
+#emergency-request-form input[type="number"],
+#emergency-request-form select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#emergency-request-form input[type="text"]:focus,
+#emergency-request-form input[type="number"]:focus,
+#emergency-request-form select:focus {
+    outline: none;
+    border-color: #da190b;
+    box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.644);
+}
+
+#emergency-request-form input[type="text"]::placeholder,
+#emergency-request-form input[type="number"]::placeholder {
+    color: #999;
+}
+
+#emergency-request-form select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 30px;
+}
+
+#emergency-request-form .checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+#emergency-request-form input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+}
+
+#emergency-request-form label {
+    font-size: 16px;
+    color: #e60000;
+}
+

@@ -105,12 +105,12 @@ const SharedData = {
 
     addEmergencyRequest(bloodType, quantity, hospitalName, isUrgent) {
         const newRequest = {
-            id: Date.now(), // Use timestamp as ID for uniqueness
+            id: Date.now(),
             bloodType,
             quantity,
+            hospitalName,
             status: 'Pending',
             date: new Date().toISOString(),
-            hospital: hospitalName,
             donorResponses: [],
             isUrgent
         };

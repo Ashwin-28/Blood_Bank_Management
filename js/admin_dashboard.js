@@ -42,11 +42,15 @@ function updateRequestsTable() {
             <td>${request.status}</td>
             <td>${request.donorResponses.length}</td>
             <td>${donorNames || 'No donors yet'}</td>
-            <td>${request.hospital}</td>
+            <td>${request.hospitalName}</td>
             <td>
                 ${request.status === 'Pending' || request.status === 'Donor Found' ? `
-                    <button class="approve-btn" onclick="approveRequest(${request.id})">Approve</button>
-                    <button class="reject-btn" onclick="rejectRequest(${request.id})">Reject</button>
+                    <button class="approve-btn" onclick="approveRequest(${request.id})">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button class="reject-btn" onclick="rejectRequest(${request.id})">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
                 ` : request.status}
             </td>
         `;
@@ -158,14 +162,18 @@ function submitEmergencyRequest(e) {
     e.preventDefault();
     const bloodType = document.getElementById('blood-type').value;
     const quantity = document.getElementById('quantity').value;
+    const hospitalName = document.getElementById('hospital-name').value;
     const isUrgent = document.getElementById('urgent').checked;
-    const hospitalName = localStorage.getItem('hospitalName') || "Unknown Hospital";
 
     const newRequest = SharedData.addEmergencyRequest(bloodType, quantity, hospitalName, isUrgent);
     
-    showNotification(`${isUrgent ? 'Urgent' : 'Emergency'} request for ${quantity} units of ${bloodType} blood submitted successfully!`);
-    updateDashboard();
-    e.target.reset();
+    if (newRequest) {
+        showAlert(`${isUrgent ? 'Urgent' : 'Emergency'} request for ${quantity} units of ${bloodType} blood submitted successfully for ${hospitalName}!`);
+        updateRequestsTable();
+        e.target.reset();
+    } else {
+        showAlert('Failed to submit emergency request. Please try again.');
+    }
 }
 
 function showNotification(message, type = 'success') {
