@@ -27,22 +27,22 @@ function updateRequestsTable() {
     const tableBody = document.querySelector('#requests-table tbody');
     tableBody.innerHTML = '';
 
-    const allRequests = [...SharedData.urgentRequests, ...SharedData.emergencyRequests];
-    allRequests.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date, most recent first
-
-    allRequests.forEach(request => {
+    SharedData.emergencyRequests.sort((a, b) => b.id - a.id).forEach(request => {
         const row = document.createElement('tr');
         if (request.isUrgent) {
             row.classList.add('urgent');
         }
+        
+        const donorNames = request.donorResponses.map(donor => donor.name).join(', ');
+        
         row.innerHTML = `
             <td>${request.id}</td>
             <td>${request.bloodType}</td>
             <td>${request.quantity}</td>
             <td>${request.status}</td>
             <td>${request.donorResponses.length}</td>
-            <td>${request.donorResponses.map(donor => donor.name).join(', ')}</td>
-            <td>${request.hospitalName}</td>
+            <td>${donorNames || 'No donors yet'}</td>
+            <td>${request.hospital}</td>
         `;
         tableBody.appendChild(row);
     });
@@ -196,3 +196,16 @@ function addEmergencyNotification(message, requestId, isUrgent) {
     SharedData.saveData();
     console.log("Added new emergency notification:", message);
 }
+
+// Call this function when the admin dashboard loads
+document.addEventListener('DOMContentLoaded', function() {
+    updateRequestsTable();
+    document.getElementById('emergency-request-form').addEventListener('submit', submitEmergencyRequest);
+    SharedData.addListener(updateDashboard);
+    window.addEventListener('bloodBridgeDataUpdated', (event) => {
+        updateDashboard();
+    });
+});
+
+// Refresh the table periodically
+setInterval(updateRequestsTable, 30000); // Every 30 seconds

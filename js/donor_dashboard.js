@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Refresh notifications every 30 seconds
     setInterval(loadEmergencyNotifications, 30000);
+
+    updateEmergencyNotifications();
 });
 
 function loadDonationHistory() {
@@ -192,29 +194,26 @@ function registerForDrive(button, date, location) {
     button.remove();
 }
 
-function respondToEmergency(button, requestId, isUrgent) {
-    console.log("Responding to emergency:", requestId, isUrgent);
+function respondToEmergency(button, requestId) {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
         showAlert('Please log in to respond to emergency requests.');
         return;
     }
 
-    // Immediately change the button to "Responded" text
-    const respondedSpan = document.createElement('span');
-    respondedSpan.textContent = 'Responded';
-    respondedSpan.style.color = '#4CAF50'; // Green color
-    respondedSpan.style.fontWeight = 'bold';
-    button.parentNode.replaceChild(respondedSpan, button);
-
-    // Then process the response
     if (SharedData.respondToEmergency(requestId, currentUser.email, currentUser.fullname)) {
-        console.log("Successfully responded to emergency");
+        // Create a new span element to replace the button
+        const respondedSpan = document.createElement('span');
+        respondedSpan.textContent = 'Responded';
+        respondedSpan.style.color = '#4CAF50'; // Green color
+        respondedSpan.style.fontWeight = 'bold';
+
+        // Replace the button with the new span
+        button.parentNode.replaceChild(respondedSpan, button);
+
         showAlert('Thank you for responding to the request. The hospital will contact you shortly with further instructions.');
     } else {
-        console.log("Failed to respond to emergency");
         showAlert('An error occurred while processing your response. Please try again later.');
-        // If the response fails, you might want to revert the button, but for now we'll leave it as "Responded"
     }
 }
 
@@ -229,15 +228,32 @@ function updateEmergencyNotifications() {
     const notificationsList = document.querySelector('#emergency-notifications ul');
     notificationsList.innerHTML = '';
 
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
     SharedData.emergencyNotifications.forEach(notification => {
         const li = document.createElement('li');
         li.textContent = notification.message;
-        li.dataset.requestId = notification.requestId;
-        
         if (notification.isUrgent) {
             li.classList.add('urgent');
         }
-
+        
+        const request = SharedData.emergencyRequests.find(r => r.id === notification.requestId);
+        
+        if (request && request.donorResponses.some(donor => donor.email === currentUser.email)) {
+            // If the current user has already responded
+            const respondedSpan = document.createElement('span');
+            respondedSpan.textContent = 'Responded';
+            respondedSpan.style.color = '#4CAF50'; // Green color
+            respondedSpan.style.fontWeight = 'bold';
+            li.appendChild(respondedSpan);
+        } else {
+            // If the user hasn't responded yet
+            const respondButton = document.createElement('button');
+            respondButton.textContent = 'Respond';
+            respondButton.onclick = () => respondToEmergency(respondButton, notification.requestId);
+            li.appendChild(respondButton);
+        }
+        
         notificationsList.appendChild(li);
     });
 }

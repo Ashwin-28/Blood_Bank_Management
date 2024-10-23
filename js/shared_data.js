@@ -104,57 +104,52 @@ const SharedData = {
     },
 
     addEmergencyRequest(bloodType, quantity, hospitalName, isUrgent) {
-        console.log("Adding emergency request:", bloodType, quantity, hospitalName, isUrgent);
         const newRequest = {
-            id: this.emergencyRequests.length + 1,
-            bloodType: bloodType,
-            quantity: quantity,
-            status: isUrgent ? 'Urgent' : 'Pending',
+            id: Date.now(), // Use timestamp as ID for uniqueness
+            bloodType,
+            quantity,
+            status: 'Pending',
             date: new Date().toISOString(),
             hospital: hospitalName,
             donorResponses: [],
-            isUrgent: isUrgent
+            isUrgent
         };
         this.emergencyRequests.push(newRequest);
-
+        
         // Add emergency notification for donors
-        this.emergencyNotifications.push({
-            id: this.emergencyNotifications.length + 1,
-            message: `${isUrgent ? 'URGENT: ' : ''}${quantity} units of ${bloodType} blood needed at ${hospitalName}`,
-            date: new Date().toISOString(),
-            requestId: newRequest.id,
-            timestamp: new Date().getTime(),
-            isUrgent: isUrgent
-        });
-
-        console.log("Emergency requests after adding:", this.emergencyRequests);
-        console.log("Emergency notifications after adding:", this.emergencyNotifications);
-
+        this.addEmergencyNotification(
+            `${isUrgent ? 'URGENT: ' : ''}${quantity} units of ${bloodType} blood needed at ${hospitalName}`,
+            newRequest.id,
+            isUrgent
+        );
+        
         this.saveData();
         return newRequest;
     },
 
-    respondToEmergency(requestId, donorEmail) {
+    respondToEmergency(requestId, donorEmail, donorName) {
+        console.log("Responding to emergency:", requestId, donorEmail, donorName);
+        
         let request = this.urgentRequests.find(r => r.id === requestId);
         if (!request) {
             request = this.emergencyRequests.find(r => r.id === requestId);
         }
 
-        if (request && !request.donorResponses.some(response => response.email === donorEmail)) {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const donor = users.find(user => user.email === donorEmail);
-            const donorName = donor ? donor.fullname : 'Unknown Donor';
-
-            request.donorResponses.push({ email: donorEmail, name: donorName });
-            
-            // If this is the first response, update the status
-            if (request.donorResponses.length === 1) {
-                request.status = 'Donor Found';
+        if (request) {
+            if (!Array.isArray(request.donorResponses)) {
+                request.donorResponses = [];
             }
-
-            this.saveData();
-            return true;
+            
+            if (!request.donorResponses.some(response => response.email === donorEmail)) {
+                request.donorResponses.push({ email: donorEmail, name: donorName });
+                request.status = 'Donor Found';
+                this.saveData();
+                console.log("Updated request:", request);
+                return true;
+            }
         }
+        
+        console.log("Failed to respond to emergency");
         return false;
     },
 
@@ -214,14 +209,14 @@ const SharedData = {
 
     addEmergencyNotification(message, requestId, isUrgent) {
         this.emergencyNotifications.push({
+            id: Date.now(),
             message,
             requestId,
             isUrgent,
-            date: new Date(),
-            timestamp: new Date().getTime()
+            date: new Date().toISOString(),
+            timestamp: Date.now()
         });
         this.saveData();
-        console.log("Added new emergency notification:", this.emergencyNotifications[this.emergencyNotifications.length - 1]);
     }
 };
 
