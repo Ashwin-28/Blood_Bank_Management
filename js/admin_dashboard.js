@@ -219,22 +219,100 @@ document.addEventListener('DOMContentLoaded', function() {
 // Refresh the table periodically
 setInterval(updateRequestsTable, 30000); // Every 30 seconds
 
+let hasRequests = true;
+let hasNotifications = true;
+
 document.getElementById('clear-all-requests').addEventListener('click', () => {
     showConfirmationModal('Are you sure you want to clear all blood requests? This action cannot be undone.', clearAllRequests);
 });
 
 function clearAllRequests() {
-    // Clear the requests from your data source (e.g., database)
-    // Then, clear the table in the UI
-    const table = document.getElementById('requests-table');
-    table.querySelector('tbody').innerHTML = '';
-    
-    // Disable the button after clearing
-    document.getElementById('clear-all-requests').disabled = true;
-    
-    // Show a success message
-    showAlert('All blood requests have been cleared.', 'success');
+    if (hasRequests) {
+        // Clear the requests from your data source (e.g., database)
+        SharedData.emergencyRequests = [];
+        SharedData.saveData();
+
+        // Clear the table in the UI
+        const table = document.getElementById('requests-table');
+        table.querySelector('tbody').innerHTML = '';
+        
+        // Disable the button after clearing
+        const clearButton = document.getElementById('clear-all-requests');
+        clearButton.disabled = true;
+        clearButton.classList.add('disabled');
+        
+        // Show a success message
+        showAlert('All blood requests have been cleared.', 'success');
+        
+        // Update the state
+        hasRequests = false;
+    }
 }
+
+function clearAllNotifications() {
+    if (hasNotifications) {
+        // Clear the notifications from your data source
+        SharedData.emergencyNotifications = [];
+        SharedData.saveData();
+
+        // Clear the notifications list in the UI
+        const notificationsList = document.getElementById('notifications-list');
+        notificationsList.innerHTML = '';
+        
+        // Disable the button after clearing
+        const clearButton = document.getElementById('clear-notifications');
+        clearButton.disabled = true;
+        clearButton.classList.add('disabled');
+        
+        // Show a success message
+        showAlert('All notifications have been cleared.', 'success');
+        
+        // Update the state
+        hasNotifications = false;
+    }
+}
+
+// Function to add a new request (example)
+function addNewRequest(requestData) {
+    if (!hasRequests) {
+        // Clear the "No requests" message if it exists
+        const table = document.getElementById('requests-table');
+        table.querySelector('tbody').innerHTML = '';
+        
+        // Enable the clear button
+        const clearButton = document.getElementById('clear-all-requests');
+        clearButton.disabled = false;
+        clearButton.classList.remove('disabled');
+        
+        hasRequests = true;
+    }
+    
+    // Add the new request to the table
+    // ... (code to add the request to the table)
+}
+
+// Function to add a new notification (example)
+function addNewNotification(notificationData) {
+    if (!hasNotifications) {
+        // Clear the "No notifications" message if it exists
+        const notificationsList = document.getElementById('notifications-list');
+        notificationsList.innerHTML = '';
+        
+        // Enable the clear button
+        const clearButton = document.getElementById('clear-notifications');
+        clearButton.disabled = false;
+        clearButton.classList.remove('disabled');
+        
+        hasNotifications = true;
+    }
+    
+    // Add the new notification to the list
+    // ... (code to add the notification to the list)
+}
+
+document.getElementById('clear-notifications').addEventListener('click', () => {
+    showConfirmationModal('Are you sure you want to clear all notifications? This action cannot be undone.', clearAllNotifications);
+});
 
 function showAlert(message, type) {
     const alertDiv = document.createElement('div');
