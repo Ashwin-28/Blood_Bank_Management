@@ -128,28 +128,18 @@ const SharedData = {
     },
 
     respondToEmergency(requestId, donorEmail, donorName) {
-        console.log("Responding to emergency:", requestId, donorEmail, donorName);
-        
-        let request = this.urgentRequests.find(r => r.id === requestId);
-        if (!request) {
-            request = this.emergencyRequests.find(r => r.id === requestId);
-        }
-
-        if (request) {
-            if (!Array.isArray(request.donorResponses)) {
-                request.donorResponses = [];
+        let request = this.emergencyRequests.find(r => r.id === requestId);
+        if (request && !request.donorResponses.some(response => response.email === donorEmail)) {
+            request.donorResponses.push({ email: donorEmail, name: donorName });
+            
+            // Only change status to 'Donor Found' if it's not already approved or rejected
+            if (request.status !== 'Approved' && request.status !== 'Rejected') {
+                request.status = 'Donor Found';
             }
             
-            if (!request.donorResponses.some(response => response.email === donorEmail)) {
-                request.donorResponses.push({ email: donorEmail, name: donorName });
-                request.status = 'Donor Found';
-                this.saveData();
-                console.log("Updated request:", request);
-                return true;
-            }
+            this.saveData();
+            return true;
         }
-        
-        console.log("Failed to respond to emergency");
         return false;
     },
 

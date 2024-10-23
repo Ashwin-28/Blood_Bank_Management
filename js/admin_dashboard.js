@@ -43,6 +43,12 @@ function updateRequestsTable() {
             <td>${request.donorResponses.length}</td>
             <td>${donorNames || 'No donors yet'}</td>
             <td>${request.hospital}</td>
+            <td>
+                ${request.status === 'Pending' || request.status === 'Donor Found' ? `
+                    <button class="approve-btn" onclick="approveRequest(${request.id})">Approve</button>
+                    <button class="reject-btn" onclick="rejectRequest(${request.id})">Reject</button>
+                ` : request.status}
+            </td>
         `;
         tableBody.appendChild(row);
     });
@@ -77,27 +83,22 @@ function addActionButtonListeners() {
 }
 
 function approveRequest(requestId) {
-    const request = findRequest(parseInt(requestId));
+    const request = SharedData.emergencyRequests.find(r => r.id === requestId);
     if (request) {
         request.status = 'Approved';
-        SharedData.inventory[request.bloodType] -= request.quantity;
         SharedData.saveData();
-        updateDashboard();
-        showNotification(`Request ${requestId} approved`);
-    } else {
-        showNotification('Request not found', 'error');
+        updateRequestsTable();
+        showAlert('Request approved successfully.');
     }
 }
 
 function rejectRequest(requestId) {
-    const request = findRequest(parseInt(requestId));
+    const request = SharedData.emergencyRequests.find(r => r.id === requestId);
     if (request) {
         request.status = 'Rejected';
         SharedData.saveData();
-        updateDashboard();
-        showNotification(`Request ${requestId} rejected`);
-    } else {
-        showNotification('Request not found', 'error');
+        updateRequestsTable();
+        showAlert('Request rejected.');
     }
 }
 
@@ -209,3 +210,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Refresh the table periodically
 setInterval(updateRequestsTable, 30000); // Every 30 seconds
+

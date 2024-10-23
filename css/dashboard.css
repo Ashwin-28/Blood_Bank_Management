@@ -1313,5 +1313,40 @@ section {
     }
 }
 
+.approve-btn, .reject-btn {
+    padding: 8px 15px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
 
+.approve-btn {
+    background-color: #2e9e32;
+    color: white;
+}
 
+.reject-btn {
+    background-color: #e60000;
+    color: white;
+}
+
+.approve-btn:hover {
+    background-color: #308d34;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+    transform: translateY(-2px);
+}
+
+.reject-btn:hover {
+    background-color: #da190b;
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+    transform: translateY(-2px);
+}
+
+.approve-btn:active, .reject-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
