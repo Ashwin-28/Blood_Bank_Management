@@ -46,12 +46,14 @@ function updateBloodHistoryTable() {
 
     allHistory.forEach(entry => {
         const row = document.createElement('tr');
+        row.dataset.type = entry.type; // Add this line to set the data-type attribute
         row.innerHTML = `
             <td>${new Date(entry.date).toLocaleString()}</td>
             <td>${entry.bloodType}</td>
             <td>${entry.quantity}</td>
             <td>${entry.type === 'incoming' ? 'Incoming' : 'Outgoing'}</td>
             <td>${entry.source || entry.destination}</td>
+            <td>${entry.donorName || 'N/A'}</td>
         `;
         tableBody.appendChild(row);
     });

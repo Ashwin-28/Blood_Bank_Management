@@ -131,12 +131,25 @@ function updateInventoryTable() {
 
     for (const [bloodType, units] of Object.entries(SharedData.inventory)) {
         const row = document.createElement('tr');
+        const status = getInventoryStatus(units);
         row.innerHTML = `
             <td>${bloodType}</td>
             <td>${units}</td>
-            <td>${units < 10 ? 'Low' : 'Sufficient'}</td>
+            <td><span class="inventory-status ${status.class}">${status.text}</span></td>
         `;
         tableBody.appendChild(row);
+    }
+}
+
+function getInventoryStatus(units) {
+    if (units <= 10) {
+        return { text: 'Critical', class: 'status-critical' };
+    } else if (units <= 20) {
+        return { text: 'Low', class: 'status-low' };
+    } else if (units <= 50) {
+        return { text: 'Moderate', class: 'status-moderate' };
+    } else {
+        return { text: 'Sufficient', class: 'status-sufficient' };
     }
 }
 
