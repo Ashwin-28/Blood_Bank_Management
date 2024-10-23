@@ -993,3 +993,10 @@ section {
 #emergency-notifications li:last-child {
     border-bottom: none;
 }
+
+#emergency-notifications li.urgent {
+    background-color: #ffcccb;
+    border: 1px solid #ff0000;
+    color: #ff0000;
+    font-weight: bold;
+}

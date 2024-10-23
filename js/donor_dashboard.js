@@ -225,6 +225,23 @@ function clearAllNotifications() {
     showAlert('All notifications have been cleared.', true);
 }
 
+function updateEmergencyNotifications() {
+    const notificationsList = document.querySelector('#emergency-notifications ul');
+    notificationsList.innerHTML = '';
+
+    SharedData.emergencyNotifications.forEach(notification => {
+        const li = document.createElement('li');
+        li.textContent = notification.message;
+        li.dataset.requestId = notification.requestId;
+        
+        if (notification.isUrgent) {
+            li.classList.add('urgent');
+        }
+
+        notificationsList.appendChild(li);
+    });
+}
+
 // Add this at the end of the file
 setInterval(() => {
     console.log("Periodic check for notifications");
