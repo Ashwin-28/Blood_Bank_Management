@@ -219,3 +219,77 @@ document.addEventListener('DOMContentLoaded', function() {
 // Refresh the table periodically
 setInterval(updateRequestsTable, 30000); // Every 30 seconds
 
+document.getElementById('clear-all-requests').addEventListener('click', () => {
+    showConfirmationModal('Are you sure you want to clear all blood requests? This action cannot be undone.', clearAllRequests);
+});
+
+function clearAllRequests() {
+    // Clear the requests from your data source (e.g., database)
+    // Then, clear the table in the UI
+    const table = document.getElementById('requests-table');
+    table.querySelector('tbody').innerHTML = '';
+    
+    // Disable the button after clearing
+    document.getElementById('clear-all-requests').disabled = true;
+    
+    // Show a success message
+    showAlert('All blood requests have been cleared.', 'success');
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert-message alert-${type}`;
+    alertDiv.innerHTML = `
+        <span class="alert-close">&times;</span>
+        ${message}
+    `;
+    document.body.appendChild(alertDiv);
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        alertDiv.classList.add('hide');
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 500);
+    }, 5000);
+
+    // Close button functionality
+    alertDiv.querySelector('.alert-close').addEventListener('click', () => {
+        alertDiv.classList.add('hide');
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 500);
+    });
+}
+
+function showConfirmationModal(message, onConfirm) {
+    const modalOverlay = document.createElement('div');
+    modalOverlay.className = 'modal-overlay';
+    
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+    
+    modalContent.innerHTML = `
+        <h3 class="modal-title">Confirm Action</h3>
+        <p class="modal-message">${message}</p>
+        <div class="modal-buttons">
+            <button class="modal-button modal-button-cancel">Cancel</button>
+            <button class="modal-button modal-button-confirm">Confirm</button>
+        </div>
+    `;
+    
+    modalOverlay.appendChild(modalContent);
+    document.body.appendChild(modalOverlay);
+    
+    const cancelButton = modalContent.querySelector('.modal-button-cancel');
+    const confirmButton = modalContent.querySelector('.modal-button-confirm');
+    
+    cancelButton.addEventListener('click', () => {
+        document.body.removeChild(modalOverlay);
+    });
+    
+    confirmButton.addEventListener('click', () => {
+        onConfirm();
+        document.body.removeChild(modalOverlay);
+    });
+}

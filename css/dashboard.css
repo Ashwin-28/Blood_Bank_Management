@@ -1407,3 +1407,199 @@ section {
     color: #e60000;
 }
 
+/* Add this new section for the Clear All Requests button */
+#clear-all-requests {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 15px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+#clear-all-requests:hover {
+    background-color: #d32f2f;
+}
+
+#clear-all-requests:active {
+    transform: translateY(1px);
+}
+
+#clear-all-requests:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Adjust the existing table container styles */
+.table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Add some space above the table for the new button */
+#requests-table {
+    margin-top: 10px;
+}
+
+/* Alert Message Styles */
+.alert-message {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+    animation: fadeIn 0.5s ease-out;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 80%;
+    width: 300px;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translate(-50%, 0); }
+    to { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+.alert-message.hide {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+/* Close button for alert messages */
+.alert-close {
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+    cursor: pointer;
+}
+
+.alert-close:hover {
+    color: #000;
+    text-decoration: none;
+    opacity: .75;
+}
+
+/* Responsive design for alert messages */
+@media screen and (max-width: 768px) {
+    .alert-message {
+        font-size: 14px;
+        padding: 10px;
+        width: 90%;
+    }
+}
+
+/* Confirmation Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.modal-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #e60000;
+}
+
+.modal-message {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.modal-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.modal-button-confirm {
+    background-color: #e60000;
+    color: white;
+}
+
+.modal-button-confirm:hover {
+    background-color: #cc0000;
+}
+
+.modal-button-cancel {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.modal-button-cancel:hover {
+    background-color: #e0e0e0;
+}
+
+.modal-button:active {
+    transform: translateY(1px);
+}
