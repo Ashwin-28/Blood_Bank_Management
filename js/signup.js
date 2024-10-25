@@ -1,5 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     const signupForm = document.getElementById('signup-form');
+    const userTypeRadios = document.querySelectorAll('input[name="user-type"]');
+    const bloodGroupField = document.getElementById('blood-group-field');
+
+    // Show/hide blood group field based on user type selection
+    userTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            bloodGroupField.style.display = this.value === 'donor' ? 'block' : 'none';
+        });
+    });
 
     signupForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -8,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirm-password').value;
         const userType = document.querySelector('input[name="user-type"]:checked').value;
+        const bloodGroup = userType === 'donor' ? document.getElementById('blood-group').value : null;
 
         if (password !== confirmPassword) {
             showCustomAlert("Passwords don't match!");
@@ -24,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Store user data locally
             const users = JSON.parse(localStorage.getItem('users')) || [];
-            const newUser = { fullname, email, password, userType };
+            const newUser = { fullname, email, password, userType, bloodGroup };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
 
@@ -34,32 +44,32 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1500);
         }, 1500);
     });
-});
 
-function showLoading() {
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.className = 'loading-overlay';
-    loadingOverlay.innerHTML = '<div class="spinner"></div>';
-    document.body.appendChild(loadingOverlay);
-}
-
-function hideLoading() {
-    const loadingOverlay = document.querySelector('.loading-overlay');
-    if (loadingOverlay) {
-        loadingOverlay.remove();
+    function showLoading() {
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'loading-overlay';
+        loadingOverlay.innerHTML = '<div class="spinner"></div>';
+        document.body.appendChild(loadingOverlay);
     }
-}
 
-function showCustomAlert(message) {
-    const alertBox = document.createElement('div');
-    alertBox.className = 'custom-alert';
-    alertBox.textContent = message;
-    document.body.appendChild(alertBox);
+    function hideLoading() {
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.remove();
+        }
+    }
 
-    alertBox.style.display = 'block';
+    function showCustomAlert(message) {
+        const alertBox = document.createElement('div');
+        alertBox.className = 'custom-alert';
+        alertBox.textContent = message;
+        document.body.appendChild(alertBox);
 
-    setTimeout(() => {
-        alertBox.style.display = 'none';
-        alertBox.remove();
-    }, 3000);
-}
+        alertBox.style.display = 'block';
+
+        setTimeout(() => {
+            alertBox.style.display = 'none';
+            alertBox.remove();
+        }, 3000);
+    }
+});

@@ -484,3 +484,43 @@ button:hover {
     from {opacity: 1;}
     to {opacity: 0;}
 }
+
+/* Blood Group Field Styles */
+#blood-group-field {
+    margin-bottom: 20px;
+}
+
+#blood-group {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23888" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+}
+
+#blood-group:focus {
+    outline: none;
+    border-color: #e60000;
+    box-shadow: 0 0 0 2px rgba(230, 0, 0, 0.2);
+}
+
+#blood-group option {
+    padding: 12px;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+    #blood-group {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+}

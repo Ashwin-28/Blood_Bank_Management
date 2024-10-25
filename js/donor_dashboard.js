@@ -26,11 +26,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadDonationHistory() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const donorBloodType = currentUser.bloodGroup;
+
     const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
     const locations = ['City Hospital', 'Red Cross Center', 'Community Clinic', 'University Medical Center', 'Downtown Blood Bank'];
-    
-    // Generate a random blood type for this donor
-    const donorBloodType = bloodTypes[Math.floor(Math.random() * bloodTypes.length)];
     
     // Generate 5-10 random donation entries
     const historyCount = Math.floor(Math.random() * 6) + 5;
@@ -41,12 +41,12 @@ function loadDonationHistory() {
         history.push({
             date: date.toISOString(),
             location: locations[Math.floor(Math.random() * locations.length)],
-            bloodType: donorBloodType, // Use the same blood type for all entries
-            quantity: Math.random() < 0.9 ? 1 : 2 // 90% chance of donating 1 unit, 10% chance of 2 units
+            bloodType: donorBloodType,
+            quantity: Math.floor(Math.random() * 2) + 1 // 1 or 2 units
         });
     }
 
-    // Sort history by date, most recent first
+    // Sort history by date (most recent first)
     history.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     const tableBody = document.querySelector('#history-table tbody');
