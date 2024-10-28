@@ -8,50 +8,114 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <h1>BloodBridge</h1>
-            </div>
-            <div class="nav-buttons">
-                <a href="index.html" class="btn btn-login">Login</a>
-                <a href="signup.html" class="btn btn-signup">Sign Up</a>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <section class="hero">
-            <div class="hero-content">
-                <h1>Save Lives Through Blood Donation</h1>
-                <p>Connect with blood donors and recipients in your area. Every donation counts.</p>
-                <div class="cta-buttons">
-                    <a href="signup.html" class="btn btn-primary">Become a Donor</a>
+    <!-- Hero Section -->
+    <div class="hero">
+        <header>
+            <nav>
+                <div class="logo">BloodBridge</div>
+                <div class="nav-links">
+                    <a href="signup.html" class="signup-btn">Sign Up</a>
+                    <a href="index.html" class="login-btn">Login</a>
                 </div>
+            </nav>
+        </header>
+        
+        <div class="hero-content">
+            <h1>Save Lives Through Blood Donation</h1>
+            <p>Connect with donors and recipients in your community</p>
+            <div class="cta-buttons">
+                <a href="index.html" class="primary-btn">Donate Now</a>
+                <a href="index.html" class="secondary-btn">Find Blood</a>
             </div>
-            <div class="hero-image">
-                <img src="/images/home_logo.jpg" alt="Blood Donation">
-            </div>
-        </section>
+        </div>
+    </div>
 
+    <!-- Main Content -->
+    <main>
         <section class="features">
-            <div class="feature-card">
-                <h3>Find Donors</h3>
-                <p>Quickly connect with blood donors in your area when you need them most.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Track Donations</h3>
-                <p>Keep track of your donation history and schedule future appointments.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Emergency Alerts</h3>
-                <p>Receive notifications when there's an urgent need for blood in your area.</p>
-            </div>
+            <!-- Add your features content here -->
         </section>
     </main>
 
+    <!-- After hero section and before footer -->
+    <section class="info-section">
+        <div class="container">
+            <h2>Why Donate Blood?</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-icon">❤️</div>
+                    <h3>Save Lives</h3>
+                    <p>One donation can save up to three lives and help patients in emergency situations.</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">🩺</div>
+                    <h3>Health Benefits</h3>
+                    <p>Regular blood donation can reduce the risk of heart disease and help in maintaining good health.</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">⏰</div>
+                    <h3>Quick Process</h3>
+                    <p>The donation process takes only about 10-15 minutes of your time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery-section">
+        <div class="container">
+            <h2>Blood Donation Gallery</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <!-- Replace src with your actual image path -->
+                    <img src="images/gallery1.jpg" alt="Blood Donation Event">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery2.jpg" alt="Donor giving blood">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery3.jpg" alt="Blood donation camp">
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer>
-        <p>&copy; 2024 BloodBridge. All rights reserved.</p>
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>About BloodBridge</h3>
+                    <p>Connecting donors with those in need, making blood donation accessible and efficient.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Donate Blood</a></li>
+                        <li><a href="#">Find Blood</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul>
+                        <li>📞 Emergency: +1 234 567 890</li>
+                        <li>📧 Email: info@bloodbridge.com</li>
+                        <li>📍 Location: Your City, Country</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-link">Facebook</a>
+                        <a href="#" class="social-link">Twitter</a>
+                        <a href="#" class="social-link">Instagram</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 BloodBridge. All rights reserved.</p>
+            </div>
+        </div>
     </footer>
 </body>
 </html>
