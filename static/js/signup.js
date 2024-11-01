@@ -35,39 +35,33 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoading();
 
         try {
-            // Get existing users or create new array
-            let users = [];
-            const existingUsers = localStorage.getItem('users');
-            if (existingUsers) {
-                users = JSON.parse(existingUsers);
+            const response = await fetch('/api/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullname,
+                    email,
+                    password,
+                    userType,
+                    bloodGroup,
+                    dateCreated: new Date().toISOString()
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showCustomAlert('Signup successful! Please log in.');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1500);
+            } else {
+                showCustomAlert(data.message || 'Signup failed. Please try again.');
             }
-
-            // Check if email already exists
-            if (users.some(user => user.email === email)) {
-                showCustomAlert('Email already exists. Please use a different email.');
-                return;
-            }
-
-            // Add new user
-            const newUser = {
-                fullname,
-                email,
-                password,
-                userType,
-                bloodGroup,
-                dateCreated: new Date().toISOString()
-            };
-            users.push(newUser);
-
-            // Save to localStorage
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            showCustomAlert('Signup successful! Please log in.');
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 1500);
         } catch (error) {
-            console.error('Error during signup:', error);
+            console.error('Signup error:', error);
             showCustomAlert('An error occurred. Please try again.');
         } finally {
             hideLoading();
