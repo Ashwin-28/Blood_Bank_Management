@@ -12,12 +12,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     signupForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+
+        // Get form values
         const fullname = document.getElementById('fullname').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirm-password').value;
-        const userType = document.querySelector('input[name="user-type"]:checked').value;
+        const userType = document.querySelector('input[name="user-type"]:checked')?.value;
         const bloodGroup = userType === 'donor' ? document.getElementById('blood-group').value : null;
+
+        // Basic validation
+        if (!fullname || !email || !password || !userType) {
+            showCustomAlert('Please fill in all required fields');
+            return;
+        }
 
         if (password !== confirmPassword) {
             showCustomAlert("Passwords don't match!");
@@ -37,7 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     email,
                     password,
                     userType,
-                    bloodGroup
+                    bloodGroup,
+                    dateCreated: new Date().toISOString()
                 })
             });
 
@@ -52,8 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 showCustomAlert(data.message || 'Signup failed. Please try again.');
             }
         } catch (error) {
-            showCustomAlert('An error occurred. Please try again.');
             console.error('Signup error:', error);
+            showCustomAlert('An error occurred. Please try again.');
         } finally {
             hideLoading();
         }
