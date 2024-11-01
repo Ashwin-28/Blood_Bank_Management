@@ -102,9 +102,6 @@ def signup():
 # User Login
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    if 'user' in session:
-        return redirect(url_for('home'))
-
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -113,52 +110,25 @@ def index():
         if conn:
             cursor = conn.cursor()
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
-            
-            try:
-                cursor.execute("""
-                    SELECT id, fullname, email, role 
-                    FROM register 
-                    WHERE email = %s AND password = %s
-                """, (email, hashed_password))
-                user = cursor.fetchone()
-                
-                if user:
-                    session['user'] = {
-                        'id': user[0],
-                        'fullname': user[1],
-                        'email': user[2],
-                        'role': user[3]
-                    }
-                    flash(f'Welcome back, {user[1]}!', 'success')
-                    
-                    # Redirect based on role
-                    if user[3] == 'admin':
-                        return redirect(url_for('admin_dashboard'))
-                    elif user[3] == 'manager':
-                        return redirect(url_for('manager_dashboard'))
-                    else:  # donor
-                        return redirect(url_for('donor_dashboard'))
-                else:
-                    flash('Invalid email or password.', 'error')
-            except Exception as e:
-                flash(f'Login error: {str(e)}', 'error')
-            finally:
-                cursor.close()
-                conn.close()
+            cursor.execute("SELECT * FROM register WHERE email = %s AND password = %s", (email, hashed_password))
+            user = cursor.fetchone()
+            cursor.close()
+            conn.close()
+
+            if user:
+                session['user'] = {'email': email, 'role': user[4]}  # Assuming role is at index 4
+                if user[4] == 'admin':
+                    return redirect(url_for('admin_dashboard'))
+                return redirect(url_for('dashboard'))
+            else:
+                flash('Invalid email or password.', 'error')
 
     return render_template('index.html')
 
-# Logout Route
-@app.route('/logout')
-def logout():
-    session.pop('user', None)
-    flash('You have been logged out successfully.', 'success')
-    return redirect(url_for('home'))
-
-# Donor Dashboard
-@app.route('/donor_dashboard')
-def donor_dashboard():
-    if 'user' not in session or session['user']['role'] != 'donor':
+# Dashboard Route for Donors
+@app.route('/dashboard')
+def dashboard():
+    if 'user' not in session or session['user']['role'] != 'user':
         flash('Access restricted to donors.', 'error')
         return redirect(url_for('login'))
 
@@ -168,27 +138,16 @@ def donor_dashboard():
         cursor = conn.cursor()
         cursor.execute("SELECT fullname, email, blood_type FROM register WHERE email = %s", (email,))
         user_data = cursor.fetchone()
+
+        cursor.execute("SELECT * FROM request WHERE blood_type = %s AND status = 'open'", (user_data[2],))
+        blood_requests = cursor.fetchall()
+
         cursor.close()
         conn.close()
-        return render_template('dashboards/donor_dashboard.html', user_data=user_data)
 
-# Manager Dashboard
-@app.route('/manager_dashboard')
-def manager_dashboard():
-    if 'user' not in session or session['user']['role'] != 'manager':
-        flash('Access restricted to managers.', 'error')
-        return redirect(url_for('login'))
+        return render_template('dashboards/donor_dashboard.html', user_data=user_data, blood_requests=blood_requests)
 
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT blood_type, quantity FROM inventory")
-        inventory = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return render_template('dashboards/manager_dashboard.html', inventory=inventory)
-
-# Admin Dashboard
+# Admin Dashboard Route
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if 'user' not in session or session['user']['role'] != 'admin':
@@ -228,10 +187,10 @@ def request_blood():
             except Exception as e:
                 conn.rollback()
                 flash('Error occurred while submitting request.', 'error')
-            finally:
-                cursor.close()
-                conn.close()
-            return redirect(url_for('donor_dashboard'))
+            
+            cursor.close()
+            conn.close()
+            return redirect(url_for('dashboard'))
 
     return render_template('request.html')
 
@@ -246,7 +205,7 @@ def donate_blood(request_id):
         cursor.close()
         conn.close()
         flash('Donation confirmed!', 'success')
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('dashboard'))
 
 # Running the App
 if __name__ == '__main__':
