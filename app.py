@@ -48,8 +48,8 @@ def index():
     return render_template('home.html')
 
 # User Registration
-@app.route('/register', methods=['GET', 'POST'])
-def register():
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
     if request.method == 'POST':
         fullname = request.form['fullname']
         email = request.form['email']
