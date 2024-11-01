@@ -19,7 +19,7 @@ body {
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/images/Download\ Blood\ Donation\ Equipment\ Background\ for\ free.jpeg');
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/static/images/Download\ Blood\ Donation\ Equipment\ Background\ for\ free.jpeg Blood\ Donation\ Equipment\ Background\ for\ free.jpeg');
     background-size: cover;
     background-position: center;
     height: 100vh;
