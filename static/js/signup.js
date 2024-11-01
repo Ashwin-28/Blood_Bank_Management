@@ -1,98 +1,30 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const signupForm = document.getElementById('signup-form');
-    const userTypeRadios = document.querySelectorAll('input[name="user-type"]');
+    const userTypeInputs = document.querySelectorAll('input[name="user_type"]');
     const bloodGroupField = document.getElementById('blood-group-field');
+    const bloodGroupSelect = document.getElementById('blood-group');
 
-    // Show/hide blood group field based on user type selection
-    userTypeRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            bloodGroupField.style.display = this.value === 'donor' ? 'block' : 'none';
+    // Handle blood group field visibility
+    userTypeInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.value === 'donor') {
+                bloodGroupField.style.display = 'block';
+                bloodGroupSelect.required = true;
+            } else {
+                bloodGroupField.style.display = 'none';
+                bloodGroupSelect.required = false;
+            }
         });
     });
 
-    signupForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
+    // Form validation
+    const form = document.getElementById('signup-form');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm-password');
 
-        // Get form values
-        const fullname = document.getElementById('fullname').value;
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirm-password').value;
-        const userType = document.querySelector('input[name="user-type"]:checked')?.value;
-        const bloodGroup = userType === 'donor' ? document.getElementById('blood-group').value : null;
-
-        // Basic validation
-        if (!fullname || !email || !password || !userType) {
-            showCustomAlert('Please fill in all required fields');
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            showCustomAlert("Passwords don't match!");
-            return;
-        }
-
-        showLoading();
-
-        try {
-            const response = await fetch('/api/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fullname,
-                    email,
-                    password,
-                    userType,
-                    bloodGroup,
-                    dateCreated: new Date().toISOString()
-                })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                showCustomAlert('Signup successful! Please log in.');
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 1500);
-            } else {
-                showCustomAlert(data.message || 'Signup failed. Please try again.');
-            }
-        } catch (error) {
-            console.error('Signup error:', error);
-            showCustomAlert('An error occurred. Please try again.');
-        } finally {
-            hideLoading();
+    form.addEventListener('submit', function(event) {
+        if (password.value !== confirmPassword.value) {
+            event.preventDefault();
+            alert('Passwords do not match!');
         }
     });
-
-    function showLoading() {
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.className = 'loading-overlay';
-        loadingOverlay.innerHTML = '<div class="spinner"></div>';
-        document.body.appendChild(loadingOverlay);
-    }
-
-    function hideLoading() {
-        const loadingOverlay = document.querySelector('.loading-overlay');
-        if (loadingOverlay) {
-            loadingOverlay.remove();
-        }
-    }
-
-    function showCustomAlert(message) {
-        const alertBox = document.createElement('div');
-        alertBox.className = 'custom-alert';
-        alertBox.textContent = message;
-        document.body.appendChild(alertBox);
-
-        alertBox.style.display = 'block';
-
-        setTimeout(() => {
-            alertBox.style.display = 'none';
-            alertBox.remove();
-        }, 3000);
-    }
 });

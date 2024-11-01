@@ -3,6 +3,8 @@ import mysql.connector
 from mysql.connector import pooling
 from datetime import datetime
 import hashlib  # For password hashing
+from werkzeug.security import generate_password_hash
+from your_database_module import db  # Import your database connection
 
 app = Flask(__name__)
 app.secret_key = "Ashwin_1828"  # Replace with a strong secret key
@@ -58,53 +60,45 @@ def home():
 # User Registration
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    if 'user' in session:
-        return redirect(url_for('home'))
-
     if request.method == 'POST':
-        # Get JSON data instead of form data
-        data = request.get_json()
-        
-        fullname = data.get('fullname')
-        email = data.get('email')
-        password = data.get('password')
-        user_type = data.get('userType')  # Changed from role to userType
-        blood_group = data.get('bloodGroup')  # Changed from blood_type to bloodGroup
-        
-        if not all([fullname, email, password, user_type]):
-            return {'message': 'Missing required fields'}, 400
+        try:
+            # Get form data
+            fullname = request.form['fullname']
+            email = request.form['email']
+            password = request.form['password']
+            user_type = request.form['user_type']
+            blood_group = request.form['blood_group'] if user_type == 'donor' else None
 
-        conn = get_db_connection()
-        if conn:
-            cursor = conn.cursor()
+            # Hash the password
+            hashed_password = generate_password_hash(password)
 
-            # Check if email already exists
-            cursor.execute("SELECT * FROM register WHERE email = %s", (email,))
-            if cursor.fetchone():
-                cursor.close()
-                conn.close()
-                return {'message': 'Email already exists'}, 400
+            # Create SQL query based on user type
+            if user_type == 'donor':
+                query = """
+                INSERT INTO users (fullname, email, password, user_type, blood_group)
+                VALUES (%s, %s, %s, %s, %s)
+                """
+                values = (fullname, email, hashed_password, user_type, blood_group)
+            else:
+                query = """
+                INSERT INTO users (fullname, email, password, user_type)
+                VALUES (%s, %s, %s, %s)
+                """
+                values = (fullname, email, hashed_password, user_type)
 
-            # Hash the password before storing
-            hashed_password = hashlib.sha256(password.encode()).hexdigest()
+            # Execute query
+            cursor = db.cursor()
+            cursor.execute(query, values)
+            db.commit()
+            cursor.close()
 
-            try:
-                cursor.execute("""
-                    INSERT INTO register (fullname, email, password, blood_type, role) 
-                    VALUES (%s, %s, %s, %s, %s)
-                """, (fullname, email, hashed_password, blood_group, user_type))
-                conn.commit()
-                cursor.close()
-                conn.close()
-                return {'message': 'Registration successful'}, 200
-            except Exception as e:
-                print(f"Database error: {str(e)}")  # For debugging
-                return {'message': 'Registration failed'}, 500
-            finally:
-                cursor.close()
-                conn.close()
-        
-        return {'message': 'Database connection failed'}, 500
+            flash('Registration successful! Please log in.', 'success')
+            return redirect(url_for('login'))
+
+        except Exception as e:
+            db.rollback()
+            flash(f'Registration failed: {str(e)}', 'error')
+            return render_template('signup.html')
 
     return render_template('signup.html')
 
