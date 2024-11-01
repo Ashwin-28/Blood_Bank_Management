@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    signupForm.addEventListener('submit', function(e) {
+    signupForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const fullname = document.getElementById('fullname').value;
         const email = document.getElementById('email').value;
@@ -24,25 +24,39 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Show loading animation
         showLoading();
 
-        // Simulate API call for signup
-        setTimeout(() => {
-            // Hide loading animation
+        try {
+            const response = await fetch('/api/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullname,
+                    email,
+                    password,
+                    userType,
+                    bloodGroup
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showCustomAlert('Signup successful! Please log in.');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1500);
+            } else {
+                showCustomAlert(data.message || 'Signup failed. Please try again.');
+            }
+        } catch (error) {
+            showCustomAlert('An error occurred. Please try again.');
+            console.error('Signup error:', error);
+        } finally {
             hideLoading();
-
-            // Store user data locally
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const newUser = { fullname, email, password, userType, bloodGroup };
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-
-            showCustomAlert('Signup successful! Please log in.');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
-        }, 1500);
+        }
     });
 
     function showLoading() {
