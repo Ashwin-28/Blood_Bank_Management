@@ -70,15 +70,15 @@ def register():
             # Hash the password before storing
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
-            cursor.execute("INSERT INTO register (fullname, email, password, blood_type) VALUES (%s, %s, %s, %s)",
-                           (fullname, email, hashed_password, blood_type))
+            cursor.execute("INSERT INTO register (fullname, email, password, blood_type, role) VALUES (%s, %s, %s, %s, %s)",
+                           (fullname, email, hashed_password, blood_type, 'user'))
             conn.commit()
             cursor.close()
             conn.close()
 
             flash('Registration successful! Please login.', 'success')
             return redirect(url_for('login'))
-    return render_template('register.html')
+    return render_template('signup.html')
 
 # User Login
 @app.route('/login', methods=['GET', 'POST'])
@@ -98,18 +98,20 @@ def login():
             conn.close()
 
             if user:
-                session['user'] = {'email': email}  # Store user info in session
+                session['user'] = {'email': email, 'role': user[4]}  # Assuming role is at index 4
+                if user[4] == 'admin':
+                    return redirect(url_for('admin_dashboard'))
                 return redirect(url_for('dashboard'))
             else:
                 flash('Invalid email or password.', 'error')
 
     return render_template('login.html')
 
-# Dashboard Route
+# Dashboard Route for Donors
 @app.route('/dashboard')
 def dashboard():
-    if 'user' not in session:
-        flash('Please login first.', 'error')
+    if 'user' not in session or session['user']['role'] != 'user':
+        flash('Access restricted to donors.', 'error')
         return redirect(url_for('login'))
 
     email = session['user']['email']
@@ -125,7 +127,30 @@ def dashboard():
         cursor.close()
         conn.close()
 
-        return render_template('dashboard.html', user_data=user_data, blood_requests=blood_requests)
+        return render_template('dashboards/donor_dashboard.html', user_data=user_data, blood_requests=blood_requests)
+
+# Admin Dashboard Route
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    if 'user' not in session or session['user']['role'] != 'admin':
+        flash('Access restricted to administrators only.', 'error')
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        # Fetch all open blood requests
+        cursor.execute("SELECT * FROM request WHERE status = 'open'")
+        open_requests = cursor.fetchall()
+
+        # Fetch blood inventory details (assuming inventory table exists)
+        cursor.execute("SELECT blood_type, quantity FROM inventory")
+        inventory = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return render_template('dashboards/admin_dashboard.html', open_requests=open_requests, inventory=inventory)
 
 # User Request Submission
 @app.route('/request', methods=['GET', 'POST'])
@@ -156,13 +181,6 @@ def request_blood():
 
     return render_template('request.html')
 
-# Respond to a Request (Implementation omitted for brevity)
-@app.route('/respond/<int:requester_id>/<int:request_id>')
-def respond(requester_id, request_id):
-    # Fetch requester and request details, then render respond.html
-    # Implementation omitted for brevity
-    pass
-
 # Donation Confirmation
 @app.route('/donate-blood/<int:request_id>/<int:requester_id>')
 def donate_blood(request_id, requester_id):
@@ -178,5 +196,4 @@ def donate_blood(request_id, requester_id):
 
 # Running the App
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000,debug=True)
-
+    app.run(host="0.0.0.0", port=5000, debug=True)
