@@ -44,7 +44,7 @@ def test_db_connection():
 
 # Home Route
 @app.route('/')
-def index():
+def home():
     return render_template('home.html')
 
 # User Registration
@@ -81,8 +81,8 @@ def signup():
     return render_template('signup.html')
 
 # User Login
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/index', methods=['GET', 'POST'])
+def index():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -105,7 +105,7 @@ def login():
             else:
                 flash('Invalid email or password.', 'error')
 
-    return render_template('login.html')
+    return render_template('index.html')
 
 # Dashboard Route for Donors
 @app.route('/dashboard')
