@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BloodBridge - Sign Up</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>BloodBridge - Login</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
@@ -13,43 +13,35 @@
         <div class="left-panel">
             <div class="content">
                 <h1>BloodBridge</h1>
-                <p>Join our community and help save lives.</p>
+                <p>Connecting donors, hospitals, and blood banks to save lives.</p>
                 <div class="features">
                     <div class="feature">
-                        <i class="fas fa-user-plus"></i>
-                        <span>Easy Registration</span>
+                        <i class="fas fa-tint"></i>
+                        <span>Efficient Blood Management</span>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Secure Platform</span>
+                        <i class="fas fa-hospital-user"></i>
+                        <span>Emergency Request Handling</span>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-hands-helping"></i>
-                        <span>Make a Difference</span>
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Easy Donation Scheduling</span>
                     </div>
                 </div>
             </div>
         </div>
         <div class="right-panel">
-            <div class="signup-container">
+            <div class="login-container">
                 <div class="logo"></div>
-                <h2>Create an Account</h2>
-                <form id="signup-form">
+                <h2>Welcome Back</h2>
+                <form id="login-form">
                     <div class="input-group">
                         <i class="fas fa-user"></i>
-                        <input type="text" id="fullname" placeholder="Full Name" required>
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-envelope"></i>
                         <input type="email" id="email" placeholder="Email" required>
                     </div>
                     <div class="input-group">
                         <i class="fas fa-lock"></i>
                         <input type="password" id="password" placeholder="Password" required>
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" id="confirm-password" placeholder="Confirm Password" required>
                     </div>
                     <div class="user-type-selector">
                         <div class="option">
@@ -74,25 +66,12 @@
                             </label>
                         </div>
                     </div>
-                    <div id="blood-group-field" style="display: none;">
-                        <select id="blood-group" name="blood-group" required>
-                            <option value="">Select Blood Group</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                        </select>
-                    </div>
-                    <button type="submit">Sign Up</button>
+                    <button type="submit">Login</button>
                 </form>
-                <p class="login-link">Already have an account? <a href="index.html">Log in</a></p>
+                <p class="signup-link">Don't have an account? <a href="/templates/signup.html">Sign up</a></p>
             </div>
         </div>
     </div>
-    <script src="js/signup.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
