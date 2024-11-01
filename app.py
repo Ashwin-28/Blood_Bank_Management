@@ -62,11 +62,17 @@ def signup():
         return redirect(url_for('home'))
 
     if request.method == 'POST':
-        fullname = request.form['fullname']
-        email = request.form['email']
-        password = request.form['password']
-        blood_type = request.form['blood_type']
-        role = request.form.get('role', 'donor')  # Default role is donor
+        # Get JSON data instead of form data
+        data = request.get_json()
+        
+        fullname = data.get('fullname')
+        email = data.get('email')
+        password = data.get('password')
+        user_type = data.get('userType')  # Changed from role to userType
+        blood_group = data.get('bloodGroup')  # Changed from blood_type to bloodGroup
+        
+        if not all([fullname, email, password, user_type]):
+            return {'message': 'Missing required fields'}, 400
 
         conn = get_db_connection()
         if conn:
@@ -75,10 +81,9 @@ def signup():
             # Check if email already exists
             cursor.execute("SELECT * FROM register WHERE email = %s", (email,))
             if cursor.fetchone():
-                flash('Email already exists. Please login.', 'error')
                 cursor.close()
                 conn.close()
-                return redirect(url_for('login'))
+                return {'message': 'Email already exists'}, 400
 
             # Hash the password before storing
             hashed_password = hashlib.sha256(password.encode()).hexdigest()
@@ -87,15 +92,19 @@ def signup():
                 cursor.execute("""
                     INSERT INTO register (fullname, email, password, blood_type, role) 
                     VALUES (%s, %s, %s, %s, %s)
-                """, (fullname, email, hashed_password, blood_type, role))
+                """, (fullname, email, hashed_password, blood_group, user_type))
                 conn.commit()
-                flash('Registration successful! Please login.', 'success')
-                return redirect(url_for('login'))
+                cursor.close()
+                conn.close()
+                return {'message': 'Registration successful'}, 200
             except Exception as e:
-                flash(f'Registration failed: {str(e)}', 'error')
+                print(f"Database error: {str(e)}")  # For debugging
+                return {'message': 'Registration failed'}, 500
             finally:
                 cursor.close()
                 conn.close()
+        
+        return {'message': 'Database connection failed'}, 500
 
     return render_template('signup.html')
 
