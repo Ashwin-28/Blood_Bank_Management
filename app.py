@@ -81,13 +81,13 @@ def signup():
                 cursor = conn.cursor()
                 if user_type == 'donor':
                     query = """
-                    INSERT INTO users (fullname, email, password, user_type, blood_group)
+                    INSERT INTO register (fullname, email, password, blood_type, user_type)
                     VALUES (%s, %s, %s, %s, %s)
                     """
-                    values = (fullname, email, hashed_password, user_type, blood_group)
+                    values = (fullname, email, hashed_password, blood_group, user_type)
                 else:
                     query = """
-                    INSERT INTO users (fullname, email, password, user_type)
+                    INSERT INTO register (fullname, email, password, user_type)
                     VALUES (%s, %s, %s, %s)
                     """
                     values = (fullname, email, hashed_password, user_type)
@@ -110,22 +110,29 @@ def signup():
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        try:
+            email = request.form['email']
+            password = request.form['password']
 
-        with get_db_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM register WHERE email = %s", (email,))
-            user = cursor.fetchone()
-            cursor.close()
+            with get_db_connection() as conn:
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute("SELECT * FROM register WHERE email = %s", (email,))
+                user = cursor.fetchone()
+                cursor.close()
 
-            if user and check_password_hash(user[2], password):  # Assuming hashed password is at index 2
-                session['user'] = {'email': email, 'role': user[4]}  # Assuming role is at index 4
-                if user[4] == 'admin':
-                    return redirect(url_for('admin_dashboard'))
-                return redirect(url_for('dashboard'))
-            else:
-                flash('Invalid email or password.', 'error')
+                if user and check_password_hash(user['password'], password):
+                    session['user'] = {
+                        'email': email,
+                        'role': user['user_type']
+                    }
+                    if user['user_type'] == 'admin':
+                        return redirect(url_for('admin_dashboard'))
+                    return redirect(url_for('dashboard'))
+                else:
+                    flash('Invalid email or password.', 'error')
+        except Exception as e:
+            flash(f'Login error: {str(e)}', 'error')
+            logging.error(f'Login error: {e}')
 
     return render_template('index.html')
 
