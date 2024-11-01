@@ -25,13 +25,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 switch(userType) {
                     case 'admin':
-                        window.location.href = 'dashboards/admin_dashboard.html';
+                        window.location.href = '/admin_dashboard';
                         break;
                     case 'donor':
-                        window.location.href = 'dashboards/donor_dashboard.html';
+                        window.location.href = '/donor_dashboard';
                         break;
                     case 'manager':
-                        window.location.href = 'dashboards/manager_dashboard.html';
+                        window.location.href = '/manager_dashboard';
                         break;
                     default:
                         showCustomAlert('Invalid user type');
