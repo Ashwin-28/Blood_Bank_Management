@@ -2,18 +2,23 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import mysql.connector
 from mysql.connector import pooling
 from datetime import datetime
-import hashlib  # For password hashing
-from werkzeug.security import generate_password_hash
+import os
+from werkzeug.security import generate_password_hash, check_password_hash
+from contextlib import contextmanager
+import logging
 
 app = Flask(__name__)
-app.secret_key = "Ashwin_1828"  # Replace with a strong secret key
+app.secret_key = os.getenv("SECRET_KEY", "default-secret-key")  # Use environment variables for sensitive data
+
+# Logging configuration
+logging.basicConfig(filename='app.log', level=logging.ERROR)
 
 # Database Configuration
 local_db_config = {
-    'user': 'admin',
-    'password': 'Ashwin_1828',
-    'host': 'database-1.c3y28cwgmdxk.us-east-1.rds.amazonaws.com',
-    'database': 'Blood_Bank_Management'
+    'user': os.getenv("DB_USER", "admin"),
+    'password': os.getenv("DB_PASSWORD", "Ashwin_1828"),
+    'host': os.getenv("DB_HOST", "database-1.c3y28cwgmdxk.us-east-1.rds.amazonaws.com"),
+    'database': os.getenv("DB_NAME", "Blood_Bank_Management")
 }
 
 # Connection pool
@@ -23,24 +28,27 @@ pool = mysql.connector.pooling.MySQLConnectionPool(
     **local_db_config
 )
 
+@contextmanager
 def get_db_connection():
     try:
-        return pool.get_connection()
+        conn = pool.get_connection()
+        yield conn
     except mysql.connector.Error as err:
         flash(f"Database connection error: {err}", 'error')
-        return None
+        logging.error(f"Database connection error: {err}")
+    finally:
+        conn.close() if 'conn' in locals() and conn.is_connected() else None
 
 # Testing the Database Connection
 @app.route('/test-db-connection')
 def test_db_connection():
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT DATABASE();")
-        db = cursor.fetchone()
-        cursor.close()
-        conn.close()
-        return f"Connected to database: {db[0]}"
+    with get_db_connection() as conn:
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT DATABASE();")
+            db = cursor.fetchone()
+            cursor.close()
+            return f"Connected to database: {db[0]}"
     return "Failed to connect to database."
 
 # Home Route
@@ -53,7 +61,7 @@ def home():
         elif role == 'manager':
             return redirect(url_for('manager_dashboard'))
         elif role == 'donor':
-            return redirect(url_for('donor_dashboard'))
+            return redirect(url_for('dashboard'))
     return render_template('home.html')
 
 # User Registration
@@ -61,52 +69,39 @@ def home():
 def signup():
     if request.method == 'POST':
         try:
-            # Get form data
             fullname = request.form['fullname']
             email = request.form['email']
             password = request.form['password']
             user_type = request.form['user_type']
             blood_group = request.form['blood_group'] if user_type == 'donor' else None
 
-            # Hash the password
             hashed_password = generate_password_hash(password)
 
-            # Get connection from pool
-            conn = get_db_connection()
-            if not conn:
-                flash('Database connection error', 'error')
-                return render_template('signup.html')
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                if user_type == 'donor':
+                    query = """
+                    INSERT INTO users (fullname, email, password, user_type, blood_group)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """
+                    values = (fullname, email, hashed_password, user_type, blood_group)
+                else:
+                    query = """
+                    INSERT INTO users (fullname, email, password, user_type)
+                    VALUES (%s, %s, %s, %s)
+                    """
+                    values = (fullname, email, hashed_password, user_type)
 
-            cursor = conn.cursor()
-
-            # Create SQL query based on user type
-            if user_type == 'donor':
-                query = """
-                INSERT INTO users (fullname, email, password, user_type, blood_group)
-                VALUES (%s, %s, %s, %s, %s)
-                """
-                values = (fullname, email, hashed_password, user_type, blood_group)
-            else:
-                query = """
-                INSERT INTO users (fullname, email, password, user_type)
-                VALUES (%s, %s, %s, %s)
-                """
-                values = (fullname, email, hashed_password, user_type)
-
-            # Execute query
-            cursor.execute(query, values)
-            conn.commit()
-            cursor.close()
-            conn.close()
+                cursor.execute(query, values)
+                conn.commit()
+                cursor.close()
 
             flash('Registration successful! Please log in.', 'success')
-            return redirect(url_for('login'))
+            return redirect(url_for('index'))
 
         except Exception as e:
-            if 'conn' in locals():
-                conn.rollback()
-                conn.close()
             flash(f'Registration failed: {str(e)}', 'error')
+            logging.error(f'Registration failed: {e}')
             return render_template('signup.html')
 
     return render_template('signup.html')
@@ -118,16 +113,13 @@ def index():
         email = request.form['email']
         password = request.form['password']
 
-        conn = get_db_connection()
-        if conn:
+        with get_db_connection() as conn:
             cursor = conn.cursor()
-            hashed_password = hashlib.sha256(password.encode()).hexdigest()
-            cursor.execute("SELECT * FROM register WHERE email = %s AND password = %s", (email, hashed_password))
+            cursor.execute("SELECT * FROM register WHERE email = %s", (email,))
             user = cursor.fetchone()
             cursor.close()
-            conn.close()
 
-            if user:
+            if user and check_password_hash(user[2], password):  # Assuming hashed password is at index 2
                 session['user'] = {'email': email, 'role': user[4]}  # Assuming role is at index 4
                 if user[4] == 'admin':
                     return redirect(url_for('admin_dashboard'))
@@ -140,13 +132,12 @@ def index():
 # Dashboard Route for Donors
 @app.route('/dashboard')
 def dashboard():
-    if 'user' not in session or session['user']['role'] != 'user':
+    if 'user' not in session or session['user']['role'] != 'donor':
         flash('Access restricted to donors.', 'error')
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
 
     email = session['user']['email']
-    conn = get_db_connection()
-    if conn:
+    with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT fullname, email, blood_type FROM register WHERE email = %s", (email,))
         user_data = cursor.fetchone()
@@ -155,27 +146,25 @@ def dashboard():
         blood_requests = cursor.fetchall()
 
         cursor.close()
-        conn.close()
 
-        return render_template('dashboards/donor_dashboard.html', user_data=user_data, blood_requests=blood_requests)
+    return render_template('dashboards/donor_dashboard.html', user_data=user_data, blood_requests=blood_requests)
 
 # Admin Dashboard Route
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if 'user' not in session or session['user']['role'] != 'admin':
         flash('Access restricted to administrators.', 'error')
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
 
-    conn = get_db_connection()
-    if conn:
+    with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM request WHERE status = 'open'")
         open_requests = cursor.fetchall()
         cursor.execute("SELECT blood_type, quantity FROM inventory")
         inventory = cursor.fetchall()
         cursor.close()
-        conn.close()
-        return render_template('dashboards/admin_dashboard.html', open_requests=open_requests, inventory=inventory)
+
+    return render_template('dashboards/admin_dashboard.html', open_requests=open_requests, inventory=inventory)
 
 # Request Blood Route
 @app.route('/request', methods=['GET', 'POST'])
@@ -185,38 +174,39 @@ def request_blood():
         blood_type = request.form['blood_type']
         urgency = request.form['urgency']
 
-        conn = get_db_connection()
-        if conn:
+        with get_db_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT id FROM register WHERE email = %s", (session['user']['email'],))
             requester_id = cursor.fetchone()[0]
 
             try:
-                cursor.execute("INSERT INTO request (location, blood_type, urgency, requester_id) VALUES (%s, %s, %s, %s)",
-                               (location, blood_type, urgency, requester_id))
+                cursor.execute(
+                    "INSERT INTO request (location, blood_type, urgency, requester_id) VALUES (%s, %s, %s, %s)",
+                    (location, blood_type, urgency, requester_id)
+                )
                 conn.commit()
                 flash('Blood request submitted successfully!', 'success')
             except Exception as e:
                 conn.rollback()
                 flash('Error occurred while submitting request.', 'error')
+                logging.error(f"Error while submitting request: {e}")
             
             cursor.close()
-            conn.close()
-            return redirect(url_for('dashboard'))
+            
+        return redirect(url_for('dashboard'))
 
     return render_template('request.html')
 
 # Donation Confirmation
 @app.route('/donate-blood/<int:request_id>')
 def donate_blood(request_id):
-    conn = get_db_connection()
-    if conn:
+    with get_db_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("UPDATE request SET status = 'donated' WHERE id = %s", (request_id,))
         conn.commit()
         cursor.close()
-        conn.close()
-        flash('Donation confirmed!', 'success')
+        
+    flash('Donation confirmed!', 'success')
     return redirect(url_for('dashboard'))
 
 # Running the App
