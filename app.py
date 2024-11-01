@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import mysql.connector
 from mysql.connector import pooling
 from datetime import datetime
-import hashlib  # Importing hashlib for password hashing
+import hashlib  # For password hashing
 
 app = Flask(__name__)
 app.secret_key = "Ashwin_1828"  # Replace with a strong secret key
@@ -15,7 +15,7 @@ local_db_config = {
     'database': 'Blood_Bank_Management'
 }
 
-# Create a connection pool
+# Connection pool
 pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="mypool",
     pool_size=5,
@@ -26,7 +26,7 @@ def get_db_connection():
     try:
         return pool.get_connection()
     except mysql.connector.Error as err:
-        flash(f"Error connecting to database: {err}", 'error')
+        flash(f"Database connection error: {err}", 'error')
         return None
 
 # Testing the Database Connection
@@ -100,8 +100,8 @@ def signup():
     return render_template('signup.html')
 
 # User Login
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/index', methods=['GET', 'POST'])
+def index():
     if 'user' in session:
         return redirect(url_for('home'))
 
@@ -146,7 +146,7 @@ def login():
                 cursor.close()
                 conn.close()
 
-    return render_template('login.html')
+    return render_template('index.html')
 
 # Logout Route
 @app.route('/logout')
@@ -155,7 +155,7 @@ def logout():
     flash('You have been logged out successfully.', 'success')
     return redirect(url_for('home'))
 
-# Separate dashboard routes
+# Donor Dashboard
 @app.route('/donor_dashboard')
 def donor_dashboard():
     if 'user' not in session or session['user']['role'] != 'donor':
@@ -172,6 +172,7 @@ def donor_dashboard():
         conn.close()
         return render_template('dashboards/donor_dashboard.html', user_data=user_data)
 
+# Manager Dashboard
 @app.route('/manager_dashboard')
 def manager_dashboard():
     if 'user' not in session or session['user']['role'] != 'manager':
@@ -187,6 +188,7 @@ def manager_dashboard():
         conn.close()
         return render_template('dashboards/manager_dashboard.html', inventory=inventory)
 
+# Admin Dashboard
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if 'user' not in session or session['user']['role'] != 'admin':
@@ -204,7 +206,7 @@ def admin_dashboard():
         conn.close()
         return render_template('dashboards/admin_dashboard.html', open_requests=open_requests, inventory=inventory)
 
-# User Request Submission
+# Request Blood Route
 @app.route('/request', methods=['GET', 'POST'])
 def request_blood():
     if request.method == 'POST':
@@ -216,7 +218,7 @@ def request_blood():
         if conn:
             cursor = conn.cursor()
             cursor.execute("SELECT id FROM register WHERE email = %s", (session['user']['email'],))
-            requester_id = cursor.fetchone()[0]  # Fetch requester ID directly
+            requester_id = cursor.fetchone()[0]
 
             try:
                 cursor.execute("INSERT INTO request (location, blood_type, urgency, requester_id) VALUES (%s, %s, %s, %s)",
@@ -226,16 +228,16 @@ def request_blood():
             except Exception as e:
                 conn.rollback()
                 flash('Error occurred while submitting request.', 'error')
-            
-            cursor.close()
-            conn.close()
+            finally:
+                cursor.close()
+                conn.close()
             return redirect(url_for('donor_dashboard'))
 
     return render_template('request.html')
 
 # Donation Confirmation
-@app.route('/donate-blood/<int:request_id>/<int:requester_id>')
-def donate_blood(request_id, requester_id):
+@app.route('/donate-blood/<int:request_id>')
+def donate_blood(request_id):
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor()
@@ -244,7 +246,7 @@ def donate_blood(request_id, requester_id):
         cursor.close()
         conn.close()
         flash('Donation confirmed!', 'success')
-    return redirect(url_for('donor_dashboard'))
+    return redirect(url_for('admin_dashboard'))
 
 # Running the App
 if __name__ == '__main__':
