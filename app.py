@@ -45,7 +45,7 @@ def test_db_connection():
 # Home Route
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('home.html')
 
 # User Registration
 @app.route('/register', methods=['GET', 'POST'])
