@@ -4,7 +4,6 @@ from mysql.connector import pooling
 from datetime import datetime
 import hashlib  # For password hashing
 from werkzeug.security import generate_password_hash
-from your_database_module import db  # Import your database connection
 
 app = Flask(__name__)
 app.secret_key = "Ashwin_1828"  # Replace with a strong secret key
@@ -72,6 +71,14 @@ def signup():
             # Hash the password
             hashed_password = generate_password_hash(password)
 
+            # Get connection from pool
+            conn = get_db_connection()
+            if not conn:
+                flash('Database connection error', 'error')
+                return render_template('signup.html')
+
+            cursor = conn.cursor()
+
             # Create SQL query based on user type
             if user_type == 'donor':
                 query = """
@@ -87,16 +94,18 @@ def signup():
                 values = (fullname, email, hashed_password, user_type)
 
             # Execute query
-            cursor = db.cursor()
             cursor.execute(query, values)
-            db.commit()
+            conn.commit()
             cursor.close()
+            conn.close()
 
             flash('Registration successful! Please log in.', 'success')
             return redirect(url_for('login'))
 
         except Exception as e:
-            db.rollback()
+            if 'conn' in locals():
+                conn.rollback()
+                conn.close()
             flash(f'Registration failed: {str(e)}', 'error')
             return render_template('signup.html')
 
