@@ -97,7 +97,7 @@ def signup():
                 cursor.close()
                 conn.close()
 
-    return render_template('auth/signup.html')
+    return render_template('signup.html')
 
 # User Login
 @app.route('/login', methods=['GET', 'POST'])
@@ -146,7 +146,7 @@ def login():
                 cursor.close()
                 conn.close()
 
-    return render_template('auth/login.html')
+    return render_template('login.html')
 
 # Logout Route
 @app.route('/logout')
@@ -229,7 +229,7 @@ def request_blood():
             
             cursor.close()
             conn.close()
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('donor_dashboard'))
 
     return render_template('request.html')
 
@@ -244,7 +244,7 @@ def donate_blood(request_id, requester_id):
         cursor.close()
         conn.close()
         flash('Donation confirmed!', 'success')
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('donor_dashboard'))
 
 # Running the App
 if __name__ == '__main__':
