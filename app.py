@@ -216,6 +216,24 @@ def donate_blood(request_id):
     flash('Donation confirmed!', 'success')
     return redirect(url_for('dashboard'))
 
+# Manager Dashboard Route
+@app.route('/manager_dashboard')
+def manager_dashboard():
+    if 'user' not in session or session['user']['role'] != 'manager':
+        flash('Access restricted to managers.', 'error')
+        return redirect(url_for('index'))
+
+    # Example logic to fetch manager-specific data
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM request WHERE status = 'open'")  # Example query
+        open_requests = cursor.fetchall()
+        cursor.execute("SELECT blood_type, quantity FROM inventory")  # Example query
+        inventory = cursor.fetchall()
+        cursor.close()
+
+    return render_template('dashboards/manager_dashboard.html', open_requests=open_requests, inventory=inventory)
+
 # Running the App
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
