@@ -18,7 +18,7 @@ local_db_config = {
     'user': os.getenv("DB_USER", "admin"),
     'password': os.getenv("DB_PASSWORD", "Ashwin_1828"),
     'host': os.getenv("DB_HOST", "database-1.c3y28cwgmdxk.us-east-1.rds.amazonaws.com"),
-    'database': os.getenv("DB_NAME", "Blood_Bank_Management")
+    'database': os.getenv("DB_NAME", "blood_bank1")
 }
 
 # Connection pool
