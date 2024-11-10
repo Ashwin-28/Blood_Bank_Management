@@ -125,9 +125,13 @@ def index():
                         'email': email,
                         'role': user['user_type']
                     }
+                    # Redirect based on the user role
                     if user['user_type'] == 'admin':
                         return redirect(url_for('admin_dashboard'))
-                    return redirect(url_for('dashboard'))
+                    elif user['user_type'] == 'manager':
+                        return redirect(url_for('manager_dashboard'))
+                    elif user['user_type'] == 'donor':
+                        return redirect(url_for('dashboard'))
                 else:
                     flash('Invalid email or password.', 'error')
         except Exception as e:
@@ -223,12 +227,11 @@ def manager_dashboard():
         flash('Access restricted to managers.', 'error')
         return redirect(url_for('index'))
 
-    # Example logic to fetch manager-specific data
     with get_db_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM request WHERE status = 'open'")  # Example query
+        cursor.execute("SELECT * FROM request WHERE status = 'open'")
         open_requests = cursor.fetchall()
-        cursor.execute("SELECT blood_type, quantity FROM inventory")  # Example query
+        cursor.execute("SELECT blood_type, quantity FROM inventory")
         inventory = cursor.fetchall()
         cursor.close()
 
