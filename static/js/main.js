@@ -14,30 +14,22 @@ document.addEventListener('DOMContentLoaded', function() {
             // Hide loading animation
             hideLoading();
 
-            // Check user credentials against locally stored data
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const user = users.find(u => u.email === email && u.password === password);
+            // Successful login (assuming validation is handled by app.py)
+            localStorage.setItem('currentUser', JSON.stringify({ email, userType: 'default' })); // Default userType for now
 
-            if (user) {
-                // Successful login
-                localStorage.setItem('currentUser', JSON.stringify(user));
-
-                // Redirect based on the user role
-                switch(user.userType) {
-                    case 'admin':
-                        window.location.href = '/admin_dashboard';
-                        break;
-                    case 'donor':
-                        window.location.href = '/dashboard'; // Updated to match Flask route
-                        break;
-                    case 'manager':
-                        window.location.href = '/manager_dashboard';
-                        break;
-                    default:
-                        showCustomAlert('Invalid user type');
-                }
-            } else {
-                showCustomAlert('Invalid email or password. Please try again.'); // Updated error message
+            // Redirect based on the user role
+            switch('default') { // Updated to use default userType
+                case 'admin':
+                    window.location.href = '/admin_dashboard';
+                    break;
+                case 'donor':
+                    window.location.href = '/dashboard'; // Updated to match Flask route
+                    break;
+                case 'manager':
+                    window.location.href = '/manager_dashboard';
+                    break;
+                default:
+                    showCustomAlert('Invalid user type');
             }
         }, 1500); // Simulated delay for API call
     });
