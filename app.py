@@ -16,8 +16,8 @@ logging.basicConfig(filename='app.log', level=logging.ERROR)
 # Database Configuration
 local_db_config = {
     'user': os.getenv("DB_USER", "admin"),
-    'password': os.getenv("DB_PASSWORD", "password"),
-    'host': os.getenv("DB_HOST", "localhost"),
+    'password': os.getenv("DB_PASSWORD", "Ashwin_1828"),
+    'host': os.getenv("DB_HOST", "database-1.c3y28cwgmdxk.us-east-1.rds.amazonaws.com"),
     'database': os.getenv("DB_NAME", "blood_bank1")
 }
 
@@ -127,8 +127,6 @@ def index():
                     }
                     if user['user_type'] == 'admin':
                         return redirect(url_for('admin_dashboard'))
-                    elif user['user_type'] == 'manager':
-                        return redirect(url_for('manager_dashboard'))
                     return redirect(url_for('dashboard'))
                 else:
                     flash('Invalid email or password.', 'error')
