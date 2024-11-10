@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        const userType = document.querySelector('input[name="user-type"]:checked').value;
 
         // Show loading animation
         showLoading();
@@ -17,18 +16,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Check user credentials against locally stored data
             const users = JSON.parse(localStorage.getItem('users')) || [];
-            const user = users.find(u => u.email === email && u.password === password && u.userType === userType);
+            const user = users.find(u => u.email === email && u.password === password);
 
             if (user) {
                 // Successful login
                 localStorage.setItem('currentUser', JSON.stringify(user));
 
-                switch(userType) {
+                // Redirect based on the user role
+                switch(user.userType) {
                     case 'admin':
                         window.location.href = '/admin_dashboard';
                         break;
                     case 'donor':
-                        window.location.href = '/donor_dashboard';
+                        window.location.href = '/dashboard'; // Updated to match Flask route
                         break;
                     case 'manager':
                         window.location.href = '/manager_dashboard';
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         showCustomAlert('Invalid user type');
                 }
             } else {
-                showCustomAlert('Invalid email, password, or user type. Please try again.');
+                showCustomAlert('Invalid email or password. Please try again.'); // Updated error message
             }
         }, 1500);
     });
