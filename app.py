@@ -123,9 +123,12 @@ def index():
                 # Debugging output
                 logging.debug(f"User fetched: {user}")  # Log the fetched user data
 
-                # Check if user exists and validate password
+                # Check if user exists
                 if user:
-                    logging.debug(f"Password from DB: {user['password']}")  # Log the stored password
+                    # Log the stored password hash
+                    logging.debug(f"Stored password hash: {user['password']}")  
+                    
+                    # Check if the provided password matches the stored hash
                     if check_password_hash(user['password'], password):
                         session['user'] = {
                             'email': email,
