@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 showCustomAlert('Invalid email or password. Please try again.'); // Updated error message
             }
-        }, 1500);
+        }, 1500); // Simulated delay for API call
     });
 });
 

@@ -16,8 +16,8 @@ logging.basicConfig(filename='app.log', level=logging.ERROR)
 # Database Configuration
 local_db_config = {
     'user': os.getenv("DB_USER", "admin"),
-    'password': os.getenv("DB_PASSWORD", "Ashwin_1828"),
-    'host': os.getenv("DB_HOST", "database-1.c3y28cwgmdxk.us-east-1.rds.amazonaws.com"),
+    'password': os.getenv("DB_PASSWORD", "password"),
+    'host': os.getenv("DB_HOST", "localhost"),
     'database': os.getenv("DB_NAME", "blood_bank1")
 }
 
@@ -125,13 +125,11 @@ def index():
                         'email': email,
                         'role': user['user_type']
                     }
-                    # Redirect based on the user role
                     if user['user_type'] == 'admin':
                         return redirect(url_for('admin_dashboard'))
                     elif user['user_type'] == 'manager':
                         return redirect(url_for('manager_dashboard'))
-                    elif user['user_type'] == 'donor':
-                        return redirect(url_for('dashboard'))
+                    return redirect(url_for('dashboard'))
                 else:
                     flash('Invalid email or password.', 'error')
         except Exception as e:
@@ -227,11 +225,12 @@ def manager_dashboard():
         flash('Access restricted to managers.', 'error')
         return redirect(url_for('index'))
 
+    # Example logic to fetch manager-specific data
     with get_db_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM request WHERE status = 'open'")
+        cursor.execute("SELECT * FROM request WHERE status = 'open'")  # Example query
         open_requests = cursor.fetchall()
-        cursor.execute("SELECT blood_type, quantity FROM inventory")
+        cursor.execute("SELECT blood_type, quantity FROM inventory")  # Example query
         inventory = cursor.fetchall()
         cursor.close()
 
