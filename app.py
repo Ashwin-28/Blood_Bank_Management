@@ -125,9 +125,13 @@ def index():
                         'email': email,
                         'role': user['user_type']
                     }
+                    # Redirecting to respective dashboard based on user role
                     if user['user_type'] == 'admin':
                         return redirect(url_for('admin_dashboard'))
-                    return redirect(url_for('dashboard'))
+                    elif user['user_type'] == 'manager':
+                        return redirect(url_for('manager_dashboard'))
+                    elif user['user_type'] == 'donor':
+                        return redirect(url_for('dashboard'))
                 else:
                     flash('Invalid email or password.', 'error')
         except Exception as e:
