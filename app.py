@@ -120,6 +120,7 @@ def index():
                 user = cursor.fetchone()
                 cursor.close()
 
+                # Check if user exists and validate password
                 if user and check_password_hash(user['password'], password):
                     session['user'] = {
                         'email': email,
@@ -133,7 +134,7 @@ def index():
                     elif user['user_type'] == 'donor':
                         return redirect(url_for('dashboard'))
                 else:
-                    flash('Invalid email or password.', 'error')
+                    flash('Invalid email or password.', 'error')  # Alert for invalid credentials
         except Exception as e:
             flash(f'Login error: {str(e)}', 'error')
             logging.error(f'Login error: {e}')
