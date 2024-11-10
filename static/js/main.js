@@ -14,22 +14,28 @@ document.addEventListener('DOMContentLoaded', function() {
             // Hide loading animation
             hideLoading();
 
-            // Successful login (assuming validation is handled by app.py)
-            localStorage.setItem('currentUser', JSON.stringify({ email, userType: 'default' })); // Default userType for now
+            // Assuming you have a function to validate user credentials
+            const isValidUser = validateUser(email, password); // New validation check
 
-            // Redirect based on the user role
-            switch('default') { // Updated to use default userType
-                case 'admin':
-                    window.location.href = '/admin_dashboard';
-                    break;
-                case 'donor':
-                    window.location.href = '/dashboard'; // Updated to match Flask route
-                    break;
-                case 'manager':
-                    window.location.href = '/manager_dashboard';
-                    break;
-                default:
-                    showCustomAlert('Invalid user type');
+            if (isValidUser) {
+                localStorage.setItem('currentUser', JSON.stringify({ email, userType: 'default' })); // Default userType for now
+
+                // Redirect based on the user role
+                switch('default') { // Updated to use default userType
+                    case 'admin':
+                        window.location.href = '/admin_dashboard';
+                        break;
+                    case 'donor':
+                        window.location.href = '/dashboard'; // Updated to match Flask route
+                        break;
+                    case 'manager':
+                        window.location.href = '/manager_dashboard';
+                        break;
+                    default:
+                        showCustomAlert('Invalid user type');
+                }
+            } else {
+                showCustomAlert('Invalid email or password'); // New alert for invalid credentials
             }
         }, 1500); // Simulated delay for API call
     });
@@ -61,4 +67,10 @@ function showCustomAlert(message) {
         alertBox.style.display = 'none';
         alertBox.remove();
     }, 3000);
+}
+
+// New function to validate user credentials
+function validateUser(email, password) {
+    // Replace this with actual validation logic (e.g., API call)
+    return email === 'user@example.com' && password === 'password123'; // Example validation
 }
